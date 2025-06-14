@@ -32,24 +32,24 @@ const HeroSection = () => {
   return (
     <div
       className="relative h-screen w-full bg-cover bg-center transition-all duration-1000 ease-in-out"
-      style={{
-        backgroundImage: `url(${current.image})`,
-      }}
+      style={{ backgroundImage: `url(${current.image})` }}
     >
-      {/* Blurred overlay + content */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center text-center px-4">
+      {/* Dark overlay (no blur) */}
+      <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-center px-4">
         <p className="text-lg text-white/80 mb-4">
           KEEP YOUR VEHICLE RUNNING SMOOTHLY
         </p>
         <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight">
           {current.title}{" "}
-          <span className="text-[#49AEFE]">{current.highlight}</span>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#49AEFE] to-blue-600">
+            {current.highlight}
+          </span>
         </h1>
         <p className="mt-6 text-lg text-white/80 max-w-2xl">{current.subtitle}</p>
         <div className="mt-10">
           <a
             href="#"
-            className="bg-[#49AEFE] text-white py-3 px-6 rounded-md shadow-lg hover:brightness-110 transition"
+            className="bg-[#49AEFE] hover:bg-blue-500 text-white py-3 px-6 rounded-md shadow-lg transition duration-300"
           >
             Our Services
           </a>
