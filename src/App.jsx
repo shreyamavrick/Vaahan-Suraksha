@@ -4,6 +4,7 @@ import WhyChooseUs from "./components/WhyChooseUs";
 import MarqueeText from "./components/MarqueeText";
 import Services from "./components/Services";
 import WhoWeAre from "./components/WhoWeAre";
+import Pricing from "./components/Pricing";
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
       <MarqueeText />
       <Services />
       <WhoWeAre/>
+      <Pricing/>
         {/* </div> */}
     </>
   );
