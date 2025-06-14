@@ -3,6 +3,7 @@ import HeroSection from "./components/HeroSection";
 import WhyChooseUs from "./components/WhyChooseUs";
 import MarqueeText from "./components/MarqueeText";
 import Services from "./components/Services";
+import WhoWeAre from "./components/WhoWeAre";
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
       <WhyChooseUs />
       <MarqueeText />
       <Services />
+      <WhoWeAre/>
         {/* </div> */}
     </>
   );
