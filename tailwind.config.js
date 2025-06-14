@@ -1,19 +1,18 @@
 // tailwind.config.js
-export default {
+module.exports = {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}", // Adjust as per your project structure
   ],
   theme: {
     extend: {
       keyframes: {
-        'slide-in': {
-          '0%': { transform: 'translateX(100%)' },
-          '100%': { transform: 'translateX(0)' },
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-50%)' }, // Moves left by 50% of container width
         },
       },
       animation: {
-        'slide-in': 'slide-in 0.4s ease-out forwards',
+        marquee: 'marquee 20s linear infinite',
       },
     },
   },
