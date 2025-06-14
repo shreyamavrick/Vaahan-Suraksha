@@ -2,6 +2,7 @@ import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
 import WhyChooseUs from "./components/WhyChooseUs";
 import MarqueeText from "./components/MarqueeText";
+import Services from "./components/Services";
 
 const App = () => {
   return (
@@ -11,6 +12,7 @@ const App = () => {
       <HeroSection />
       <WhyChooseUs />
       <MarqueeText />
+      <Services />
         {/* </div> */}
     </>
   );
