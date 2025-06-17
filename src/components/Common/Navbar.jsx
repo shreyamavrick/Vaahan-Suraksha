@@ -1,7 +1,8 @@
 import { Menu, X, PhoneCall } from "lucide-react";
 import { useState } from "react";
-import logo from "../assets/logo.avif";
-import { navItems } from "../constants";
+import { Link } from "react-router-dom"; // <-- Import Link
+import logo from "../../assets/logo.avif";
+import { navItems } from "../../constants";
 
 const Navbar = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
@@ -16,36 +17,38 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <div className="flex items-center flex-shrink-0">
-            <img
-              className="h-16 w-auto mr-2 hover:scale-105 transition-transform duration-300"
-              src={logo}
-              alt="Logo"
-            />
+            <Link to="/">
+              <img
+                className="h-16 w-auto mr-2 hover:scale-105 transition-transform duration-300"
+                src={logo}
+                alt="Logo"
+              />
+            </Link>
           </div>
 
           {/* Desktop Nav */}
           <ul className="hidden lg:flex ml-14 space-x-12 transition-all duration-300">
             {navItems.map((item, index) => (
               <li key={index}>
-                <a
-                  href={item.href}
+                <Link
+                  to={item.href}
                   className="relative group transition-colors duration-200 text-black hover:text-[#49AEFE]"
                 >
                   {item.label}
                   <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-[#49AEFE] transition-all duration-300 group-hover:w-full"></span>
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
 
           {/* Desktop Buttons */}
           <div className="hidden lg:flex justify-center space-x-6 items-center">
-            <a
-              href="#"
+            <Link
+              to="/signin"
               className="py-2 px-3 border border-black rounded-md text-black hover:bg-black hover:text-white transition-all duration-300"
             >
               Sign In
-            </a>
+            </Link>
             <a
               href="#"
               className="flex items-center gap-2 py-2 px-4 text-white font-semibold text-sm rounded-md bg-[#49AEFE] shadow-md hover:shadow-xl hover:brightness-110 transition duration-300 animate-pulse"
@@ -77,22 +80,24 @@ const Navbar = () => {
             <ul className="space-y-6 mb-8 text-center">
               {navItems.map((item, index) => (
                 <li key={index}>
-                  <a
-                    href={item.href}
+                  <Link
+                    to={item.href}
+                    onClick={toggleNavbar}
                     className="text-black text-lg hover:text-[#49AEFE] transition-all duration-300"
                   >
                     {item.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
             <div className="flex flex-col items-center space-y-4">
-              <a
-                href="#"
+              <Link
+                to="/signin"
+                onClick={toggleNavbar}
                 className="py-2 px-3 border border-black rounded-md text-black hover:bg-black hover:text-white transition"
               >
                 Sign In
-              </a>
+              </Link>
               <a
                 href="#"
                 className="flex items-center gap-2 py-2 px-4 text-white font-semibold text-sm rounded-md bg-[#49AEFE] shadow-md hover:shadow-xl hover:brightness-110 transition duration-300"

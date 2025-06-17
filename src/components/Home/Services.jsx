@@ -1,10 +1,10 @@
 import React from 'react';
 import { FaArrowRight } from 'react-icons/fa';
-import BatteryImg from "../assets/battery.jpg";
-import DetailingImg from "../assets/detailing.jpg";
-import EngineImg from "../assets/engine.jpg";
-import SpaImg from "../assets/spa.jpg";
-import TowingImg from "../assets/towing.jpg";
+import BatteryImg from "../../assets/battery.jpg";
+import DetailingImg from "../../assets/detailing.jpg";
+import EngineImg from "../../assets/engine.jpg";
+import SpaImg from "../../assets/spa.jpg";
+import TowingImg from "../../assets/towing.jpg";
 
 const services = [
   {

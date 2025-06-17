@@ -1,5 +1,5 @@
 import { Send } from "lucide-react";
-import logo from "../assets/logo.avif";
+import logo from "../../assets/logo.avif";
 
 const Footer = () => {
   return (

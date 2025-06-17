@@ -1,31 +1,20 @@
-import Navbar from "./components/Navbar";
-import HeroSection from "./components/HeroSection";
-import WhyChooseUs from "./components/WhyChooseUs";
-import MarqueeText from "./components/MarqueeText";
-import Services from "./components/Services";
-import WhoWeAre from "./components/WhoWeAre";
-import Pricing from "./components/Pricing";
-import Testimonials from "./components/Testimonials";
-import ContactForm from "./components/ContactForm";
-import Footer from "./components/Footer";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Common/Navbar';
+import Footer from './components/Common/Footer';
+import Home from './pages/Home';
+import About from './pages/About';
 
-const App = () => {
+function App() {
   return (
-    <>
+    <Router>
       <Navbar />
-      {/* <div className="max-w-7xl mx-auto pt-20 px-6"> */}
-      <HeroSection />
-      <WhyChooseUs />
-      <MarqueeText />
-      <Services />
-      <WhoWeAre/>
-      <Pricing/>
-      <Testimonials/>
-      <ContactForm/>
-      <Footer/>
-        {/* </div> */}
-    </>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+      </Routes>
+      <Footer />
+    </Router>
   );
-};
+}
 
 export default App;

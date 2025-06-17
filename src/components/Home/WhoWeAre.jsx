@@ -1,6 +1,6 @@
 import React from "react";
 import { FaCheckCircle } from "react-icons/fa";
-import WhoWeAreVideo from "../assets/whoweare.mp4"; // Replace with your actual video path
+import WhoWeAreVideo from "../../assets/whoweare.mp4"; 
 
 const features = [
   "Tyre & Wheel Upgrade",

@@ -1,4 +1,4 @@
-import bgImg from "../assets/contact-form-bg.jpg"; // Update path as per your file
+import bgImg from "../../assets/contact-form-bg.jpg"; // Update path as per your file
 import { Send } from "lucide-react";
 
 const ContactFormWithBG = () => {

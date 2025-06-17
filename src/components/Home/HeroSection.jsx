@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import hero_img_1 from "../assets/hero_img_1.jpg";
-import hero_img_2 from "../assets/hero_img_2.jpg";
+import hero_img_1 from "../../assets/hero_img_1.jpg";
+import hero_img_2 from "../../assets/hero_img_2.jpg";
 
 const slides = [
   {

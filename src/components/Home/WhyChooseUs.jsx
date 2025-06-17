@@ -1,5 +1,5 @@
 import { Clock, Users, ShieldCheck, Handshake } from "lucide-react";
-import carImage from "../assets/about-img.avif"; // Transparent car image
+import carImage from "../../assets/about-img.avif"; // Transparent car image
 
 const WhyChooseUs = () => {
   return (
