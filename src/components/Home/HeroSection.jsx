@@ -5,15 +5,15 @@ import hero_img_2 from "../../assets/hero_img_2.jpg";
 const slides = [
   {
     image: hero_img_1,
-    title: "Advanced Vehicle Care",
-    highlight: "Quality Service",
-    subtitle: "Diagnostics, Repairs and Upgrades, All at one place",
+    title: "24/7 Roadside Help",
+    highlight: "We’re here!",
+    subtitle: "Instant assistance for vehicle breakdowns anywhere.",
   },
   {
     image: hero_img_2,
-    title: "Complete Auto Solutions",
-    highlight: "Fast & Trusted",
-    subtitle: "We care for your car like it's our own",
+    title: "Advanced Vehicle Care",
+    highlight: "Quality Service",
+    subtitle: "Diagnostics, Repairs and Upgrades, All at one place",
   },
 ];
 
@@ -34,22 +34,24 @@ const HeroSection = () => {
       className="relative h-screen w-full bg-cover bg-center transition-all duration-1000 ease-in-out"
       style={{ backgroundImage: `url(${current.image})` }}
     >
-      {/* Dark overlay (no blur) */}
+      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-center px-4">
-        <p className="text-lg text-white/80 mb-4">
-          KEEP YOUR VEHICLE RUNNING SMOOTHLY
+        <p className="text-xs sm:text-sm md:text-lg text-white/80 mb-2 md:mb-4 uppercase tracking-wide">
+          STUCK ON THE ROAD? WE’VE GOT YOU!
         </p>
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-tight">
-          {current.title}{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#49AEFE] to-blue-600">
-            {current.highlight}
-          </span>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-snug">
+          {current.title}
         </h1>
-        <p className="mt-6 text-lg text-white/80 max-w-2xl">{current.subtitle}</p>
-        <div className="mt-10">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white mt-2">
+          {current.highlight}
+        </h2>
+        <p className="mt-4 text-sm sm:text-base md:text-lg text-white/80 max-w-xl">
+          {current.subtitle}
+        </p>
+        <div className="mt-8">
           <a
             href="#"
-            className="bg-[#49AEFE] hover:bg-blue-500 text-white py-3 px-6 rounded-md shadow-lg transition duration-300"
+            className="bg-[#49AEFE] hover:bg-blue-500 text-white font-medium py-2 px-6 sm:px-8 rounded-full shadow-lg transition duration-300 text-base sm:text-lg"
           >
             Our Services
           </a>
