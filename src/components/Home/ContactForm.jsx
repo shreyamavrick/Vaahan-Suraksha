@@ -1,4 +1,4 @@
-import bgImg from "../../assets/contact-form-bg.jpg"; // Update path as per your file
+import bgImg from "../../assets/contact-form-bg.jpg"; 
 import { Send } from "lucide-react";
 
 const ContactFormWithBG = () => {
@@ -8,7 +8,7 @@ const ContactFormWithBG = () => {
       style={{ backgroundImage: `url(${bgImg})` }}
     >
       <div className="flex flex-col lg:flex-row w-full">
-        {/* LEFT (Form with black background) */}
+        
         <div className="w-full lg:w-1/2 bg-black bg-opacity-90 p-10 lg:p-20 text-white flex flex-col justify-center">
           <p className="text-blue-400 uppercase tracking-widest font-medium mb-2">
             / Cost Calculator /
@@ -54,7 +54,7 @@ const ContactFormWithBG = () => {
           </form>
         </div>
 
-        {/* RIGHT (Image side - no overlay) */}
+        {/* RIGHT */}
         <div className="hidden lg:block lg:w-1/2"></div>
       </div>
     </section>

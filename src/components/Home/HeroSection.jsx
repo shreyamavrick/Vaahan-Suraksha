@@ -34,10 +34,10 @@ const HeroSection = () => {
       className="relative h-screen w-full bg-cover bg-center transition-all duration-1000 ease-in-out"
       style={{ backgroundImage: `url(${current.image})` }}
     >
-      {/* Dark overlay */}
+      
       <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center text-center px-4">
         <p className="text-xs sm:text-sm md:text-lg text-white/80 mb-2 md:mb-4 uppercase tracking-wide">
-          STUCK ON THE ROAD? WE’VE GOT YOU!
+          STUCK ON THE ROAD? WE'VE GOT YOU!
         </p>
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-snug">
           {current.title}

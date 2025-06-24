@@ -7,7 +7,7 @@ const About = () => {
     <div>
       <AboutHeroSection />
       <ExperienceSection/>
-      <CompanyInfoSection/>
+      <CompanyInfoSection/>   
     </div>
   );
 };
