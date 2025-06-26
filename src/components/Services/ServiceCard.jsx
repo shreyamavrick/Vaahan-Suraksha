@@ -7,13 +7,14 @@ const ServiceCard = ({ data }) => {
   return (
     <div className="flex flex-col md:flex-row bg-white p-4 md:p-6 rounded-xl shadow-md gap-4 w-full">
       {/* Image Section */}
-      <div className="w-full md:w-1/2">
-        <img
-          src={data.imageUrl}
-          alt={data.name}
-          className="w-full h-auto max-h-60 object-cover rounded-lg"
-        />
-      </div>
+      <div className="w-full md:w-1/2 bg-yellow-100">
+  <img
+    src={data.imageUrl}
+    alt="test"
+    className="w-full h-auto max-h-64 object-cover rounded-lg"
+  />
+</div>
+
 
       {/* Content Section */}
       <div className="w-full md:w-1/2 flex flex-col justify-between">

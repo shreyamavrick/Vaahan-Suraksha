@@ -1,3 +1,5 @@
+import periodic from "../assets/periodic.jpg"
+import clutch from "../assets/clutch.jpg"
 const categoriesData = [
   {
     id: "periodic",
@@ -16,7 +18,7 @@ const categoriesData = [
         discount: "20% OFF",
         recommended: true,
         isNew: false,
-        imageUrl: "/src/assets/periodic.jpg",
+        imageUrl: periodic,
       },
     ],
   },
@@ -43,7 +45,7 @@ const categoriesData = [
         discount: "12% OFF",
         recommended: true,
         isNew: true,
-        imageUrl: "/src/assets/Clutch.jpg",
+        imageUrl: clutch,
       },
     ],
   },
