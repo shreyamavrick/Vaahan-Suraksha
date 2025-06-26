@@ -1,3 +1,5 @@
+import battery from "../assets/battery.jpg"
+import hero from "../assets/hero_img_1.jpg"
 const categoriesData = [
   {
     id: "periodic",
@@ -16,7 +18,7 @@ const categoriesData = [
         discount: "20% OFF",
         recommended: true,
         isNew: false,
-        imageUrl: "../../public/periodic.jpg",
+        imageUrl: battery,
       },
     ],
   },
@@ -43,7 +45,7 @@ const categoriesData = [
         discount: "12% OFF",
         recommended: true,
         isNew: true,
-        imageUrl: "../../public/Clutch.jpg",
+        imageUrl: hero,
       },
     ],
   },
