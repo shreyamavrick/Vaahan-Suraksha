@@ -4,10 +4,13 @@ import ServiceCard from "./ServiceCard";
 const CategorySection = ({ category }) => {
   return (
     <div className="flex flex-col gap-6">
-      <h2 className="text-2xl font-bold">{category.name}</h2>
-      {category.services.map((service) => (
-        <ServiceCard key={service.id} data={service} />
-      ))}
+      {category.services && category.services.length > 0 ? (
+        category.services.map((service) => (
+          <ServiceCard key={service.id} data={service} />
+        ))
+      ) : (
+        <p className="text-gray-600">No services available in this category.</p>
+      )}
     </div>
   );
 };
