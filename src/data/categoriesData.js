@@ -1,0 +1,53 @@
+const categoriesData = [
+  {
+    id: "periodic",
+    name: "Periodic Services",
+    services: [
+      {
+        id: 1,
+        name: "Basic Car Service",
+        rating: 4.5,
+        duration: "3-4 hours",
+        usage: "5,000 Kms or 6 Months",
+        interval: "Every 5,000 Kms",
+        included: ["Engine Oil Replacement", "Oil Filter", "General Inspection"],
+        oldPrice: 2500,
+        newPrice: 1999,
+        discount: "20% OFF",
+        recommended: true,
+        isNew: false,
+        imageUrl: "/src/assets/periodic.jpg",
+      },
+    ],
+  },
+  {
+    id: "clutch",
+    name: "Clutch & Body Parts",
+    services: [
+      {
+        id: 2,
+        name: "Clutch Overhaul Service",
+        rating: 5,
+        duration: "5-6 hours",
+        usage: "10,000 Kms or 1 Year",
+        interval: "Every 50,000 Kms or as required",
+        included: [
+          "Clutch Plate Replacement",
+          "Pressure Plate Replacement",
+          "Release Bearing Inspection",
+          "Flywheel Inspection",
+          "Clutch Cable Adjustment",
+        ],
+        oldPrice: 12000,
+        newPrice: 10599,
+        discount: "12% OFF",
+        recommended: true,
+        isNew: true,
+        imageUrl: "/src/assets/Clutch.jpg",
+      },
+    ],
+  },
+  // Add more categories similarly
+];
+
+export default categoriesData;
