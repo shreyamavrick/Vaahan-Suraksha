@@ -76,20 +76,20 @@ const HeroSection = () => {
 
   return (
     <div className="w-full container mx-auto md:mt-4 flex items-center">
-      <div className="relative flex items-center w-full h-[500px] md:h-[550px] md:rounded-3xl overflow-hidden">
+      <div className="relative flex items-center w-full h-auto md:h-[550px] md:rounded-3xl overflow-hidden">
         {slides.map((slide, index) => (
           <div
             key={index}
-            className={`absolute w-full h-full transition-opacity duration-1000 ${
+            className={`absolute w-full transition-opacity duration-1000 ${
               index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
             }`}
           >
             <div
-              className="w-full h-full bg-cover bg-center transition-all duration-1000"
+              className="w-full min-h-[650px] md:h-full bg-cover bg-center transition-all duration-1000"
               style={{ backgroundImage: `url(${slide.image})` }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex items-center justify-between px-4 md:px-10">
-                <div className="text-white max-w-[50%]">
+              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex flex-col md:flex-row items-center justify-between px-4 md:px-10 space-y-4 md:space-y-0 py-6">
+                <div className="text-white w-full md:max-w-[50%] text-center md:text-left">
                   <p className="text-sm font-medium uppercase tracking-wider mb-2">
                     {slide.tagline}
                   </p>
@@ -108,7 +108,7 @@ const HeroSection = () => {
                 </div>
 
                 {/* Right Multi-step Form */}
-                <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+                <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-auto md:mx-0">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">
                     Get instant quotes for your car service
                   </h3>
@@ -138,7 +138,7 @@ const HeroSection = () => {
                         onChange={(e) => setMobile(e.target.value)}
                         className="w-full mb-3 p-2 border border-gray-300 rounded"
                       />
-                      <button onClick={handleNext} className="w-full bg-red-600 text-white font-semibold py-2 rounded">
+                      <button onClick={handleNext} className="w-full bg-blue-600 text-white font-semibold py-2 rounded">
                         Continue
                       </button>
                     </>
@@ -202,7 +202,7 @@ const HeroSection = () => {
                           </div>
                         ))}
                       </div>
-                      <button onClick={handleSubmit} className="mt-4 w-full bg-red-600 text-white font-semibold py-2 rounded">
+                      <button onClick={handleSubmit} className="mt-4 w-full bg-blue-600 text-white font-semibold py-2 rounded">
                         Check Prices for Free
                       </button>
                     </>
