@@ -1,0 +1,136 @@
+{
+  "manufacturers": [
+    {
+      "name": "Maruti Suzuki",
+      "logo": "https://link-to-maruti-logo.png",
+      "models": [
+        {
+          "name": "Swift",
+          "image": "https://link-to-swift.png"
+        },
+        {
+          "name": "WagonR",
+          "image": "https://link-to-wagonr.png"
+        },
+        {
+          "name": "Baleno",
+          "image": "https://link-to-baleno.png"
+        },
+        {
+          "name": "Alto",
+          "image": "https://link-to-alto.png"
+        },
+        {
+          "name": "Ertiga",
+          "image": "https://link-to-ertiga.png"
+        },
+        {
+          "name": "Ciaz",
+          "image": "https://link-to-ciaz.png"
+        },
+        {
+          "name": "Dzire",
+          "image": "https://link-to-dzire.png"
+        },
+        {
+          "name": "S-Presso",
+          "image": "https://link-to-spresso.png"
+        }
+      ]
+    },
+    {
+      "name": "Hyundai",
+      "logo": "https://link-to-hyundai-logo.png",
+      "models": [
+        {
+          "name": "i20",
+          "image": "https://link-to-i20.png"
+        },
+        {
+          "name": "i10",
+          "image": "https://link-to-i10.png"
+        },
+        {
+          "name": "Creta",
+          "image": "https://link-to-creta.png"
+        },
+        {
+          "name": "Venue",
+          "image": "https://link-to-venue.png"
+        },
+        {
+          "name": "Verna",
+          "image": "https://link-to-verna.png"
+        },
+        {
+          "name": "Aura",
+          "image": "https://link-to-aura.png"
+        },
+        {
+          "name": "Elantra",
+          "image": "https://link-to-elantra.png"
+        },
+        {
+          "name": "Tucson",
+          "image": "https://link-to-tucson.png"
+        }
+      ]
+    },
+    {
+      "name": "Tata",
+      "logo": "https://link-to-tata-logo.png",
+      "models": [
+        {
+          "name": "Tiago",
+          "image": "https://link-to-tiago.png"
+        },
+        {
+          "name": "Tigor",
+          "image": "https://link-to-tigor.png"
+        },
+        {
+          "name": "Nexon",
+          "image": "https://link-to-nexon.png"
+        },
+        {
+          "name": "Harrier",
+          "image": "https://link-to-harrier.png"
+        },
+        {
+          "name": "Safari",
+          "image": "https://link-to-safari.png"
+        },
+        {
+          "name": "Altroz",
+          "image": "https://link-to-altroz.png"
+        },
+        {
+          "name": "Punch",
+          "image": "https://link-to-punch.png"
+        },
+        {
+          "name": "Zest",
+          "image": "https://link-to-zest.png"
+        }
+      ]
+    }
+  ],
+  "fuelTypes": [
+    {
+      "type": "Petrol",
+      "icon": "https://link-to-petrol-icon.png"
+    },
+    {
+      "type": "Diesel",
+      "icon": "https://link-to-diesel-icon.png"
+    },
+    {
+      "type": "CNG",
+      "icon": "https://link-to-cng-icon.png"
+    },
+    {
+      "type": "Electric",
+      "icon": "https://link-to-electric-icon.png"
+    }
+  ]
+}

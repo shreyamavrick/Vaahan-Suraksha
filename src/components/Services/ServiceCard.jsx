@@ -1,5 +1,3 @@
-// components/ServiceCard.jsx
-
 import React from "react";
 import IncludedServiceChip from "./IncludedServiceChip";
 
@@ -11,11 +9,7 @@ const ServiceCard = ({ data }) => {
   <img
     src={data.imageUrl}
     alt={data.name}
-    onError={(e) => {
-      e.target.onerror = null;
-      e.target.src = "https://via.placeholder.com/600x300?text=Image+Missing";
-    }}
-    className="w-full h-52 md:h-64 object-cover rounded-lg"
+    className="w-full h-full object-cover"
   />
 </div>
 
@@ -60,11 +54,11 @@ const ServiceCard = ({ data }) => {
           </div>
         </div>
         <button className="mt-4 w-full md:w-fit px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-          Add to Cart +
+          Add to Cart
         </button>
       </div>
     </div>
   );
 };
 
-export default ServiceCard;
+export default ServiceCard; 
