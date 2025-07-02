@@ -4,12 +4,12 @@ import hero_img_1 from "../../assets/hero_img_1.jpg";
 import hero_img_2 from "../../assets/hero_img_2.jpg";
 import vehicleData from "../../data/vehicle_data.json";
 
-const logo = "../../../public/logo.avif"; 
+const logo = "/logo.avif";
 
 const slides = [
   {
     image: hero_img_1,
-    tagline: "STUCK ON THE ROAD? WE’VE GOT YOU!",
+    tagline: "STUCK ON THE ROAD? WE'VE GOT YOU!",
     title: "24/7 Roadside Help",
     highlight: "We’re here!",
     subtitle: "Instant assistance for vehicle breakdowns anywhere.",
@@ -25,6 +25,7 @@ const slides = [
 
 const HeroSection = () => {
   const navigate = useNavigate();
+
   const [currentSlide, setCurrentSlide] = useState(0);
   const [step, setStep] = useState(1);
   const [location, setLocation] = useState("");
@@ -33,6 +34,7 @@ const HeroSection = () => {
   const [model, setModel] = useState("");
   const [fuel, setFuel] = useState("");
   const [showSplash, setShowSplash] = useState(true);
+  const [errors, setErrors] = useState({});
 
   const detectLocation = () => {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -54,16 +56,39 @@ const HeroSection = () => {
   }, []);
 
   const handleNext = () => {
-    if (step < 4) setStep((prev) => prev + 1);
-  };
+    const newErrors = {};
 
-  const handleBack = () => {
-    if (step > 1) setStep((prev) => prev - 1);
+    if (step === 1) {
+      if (!location.trim()) newErrors.location = "City is required";
+      if (!mobile.trim()) newErrors.mobile = "Mobile number is required";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length === 0) {
+      setStep((prev) => prev + 1);
+    }
   };
 
   const handleSubmit = () => {
-    navigate("/services");
-  };
+  const newErrors = {};
+  if (!fuel) newErrors.fuel = "Please select a fuel type";
+
+  setErrors(newErrors);
+
+  if (Object.keys(newErrors).length === 0) {
+    navigate("/services", {
+      state: {
+        location,
+        mobile,
+        manufacturer,
+        model,
+        fuel,
+      },
+    });
+  }
+};
+
 
   if (showSplash) {
     return (
@@ -87,8 +112,8 @@ const HeroSection = () => {
             className="w-full h-screen bg-cover bg-center"
             style={{ backgroundImage: `url(${slide.image})` }}
           >
-            <div className="absolute inset-0 bg-black/30 flex flex-col md:flex-row items-center justify-center px-4 md:px-12 py-6 overflow-y-auto">
-              {/* Text Left */}
+            <div className="absolute inset-0 bg-black/35 flex flex-col md:flex-row items-center justify-center px-4 md:px-12 py-6 overflow-y-auto">
+              {/* Text Content */}
               <div className="text-white text-center md:text-left w-full md:w-1/2 mb-8 md:mb-0">
                 <p className="text-sm font-medium uppercase tracking-wider mb-2">
                   {slide.tagline}
@@ -107,7 +132,7 @@ const HeroSection = () => {
                 </button>
               </div>
 
-              {/* Form Right */}
+              {/* Multi-step Form */}
               <div className="bg-white rounded-xl shadow-xl p-6 w-full md:w-1/2 max-w-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">
                   Get instant quotes for your car service
@@ -115,7 +140,7 @@ const HeroSection = () => {
 
                 {step > 1 && (
                   <button
-                    onClick={handleBack}
+                    onClick={() => setStep((prev) => prev - 1)}
                     className="text-sm text-blue-600 mb-2 hover:underline"
                   >
                     ← Back
@@ -129,16 +154,23 @@ const HeroSection = () => {
                       placeholder="Enter City"
                       value={location}
                       onChange={(e) => setLocation(e.target.value)}
-                      className="w-full mb-3 p-2 border border-gray-300 rounded"
+                      className="w-full mb-1 p-2 border border-gray-300 rounded"
                     />
+                    {errors.location && <p className="text-red-500 text-sm mb-2">{errors.location}</p>}
+
                     <input
                       type="tel"
                       placeholder="Enter Mobile Number"
                       value={mobile}
                       onChange={(e) => setMobile(e.target.value)}
-                      className="w-full mb-3 p-2 border border-gray-300 rounded"
+                      className="w-full mb-1 p-2 border border-gray-300 rounded"
                     />
-                    <button onClick={handleNext} className="w-full bg-blue-600 text-white font-semibold py-2 rounded">
+                    {errors.mobile && <p className="text-red-500 text-sm mb-2">{errors.mobile}</p>}
+
+                    <button
+                      onClick={handleNext}
+                      className="w-full bg-blue-600 text-white font-semibold py-2 rounded mt-2"
+                    >
                       Continue
                     </button>
                   </>
@@ -155,7 +187,7 @@ const HeroSection = () => {
                             setManufacturer(brand.name);
                             setStep(3);
                           }}
-                          className="cursor-pointer hover:scale-105 transition text-center bg-gray-100 px-3 py-2 rounded"
+                          className="cursor-pointer text-center bg-gray-100 px-3 py-2 rounded hover:scale-105 transition"
                         >
                           {brand.name}
                         </div>
@@ -177,7 +209,7 @@ const HeroSection = () => {
                               setModel(m.name);
                               setStep(4);
                             }}
-                            className="cursor-pointer hover:scale-105 transition text-center bg-gray-100 px-3 py-2 rounded"
+                            className="cursor-pointer text-center bg-gray-100 px-3 py-2 rounded hover:scale-105 transition"
                           >
                             {m.name}
                           </div>
@@ -189,6 +221,7 @@ const HeroSection = () => {
                 {step === 4 && (
                   <>
                     <p className="font-semibold mb-2">Select Fuel Type</p>
+                    {errors.fuel && <p className="text-red-500 text-sm mb-2">{errors.fuel}</p>}
                     <div className="grid grid-cols-2 gap-4">
                       {vehicleData.fuelTypes.map((f) => (
                         <div
@@ -202,7 +235,10 @@ const HeroSection = () => {
                         </div>
                       ))}
                     </div>
-                    <button onClick={handleSubmit} className="mt-4 w-full bg-blue-600 text-white font-semibold py-2 rounded">
+                    <button
+                      onClick={handleSubmit}
+                      className="mt-4 w-full bg-blue-600 text-white font-semibold py-2 rounded"
+                    >
                       Check Prices for Free
                     </button>
                   </>
