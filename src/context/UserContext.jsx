@@ -8,16 +8,14 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
-        const name = firebaseUser.displayName || localStorage.getItem("fullName");
-        setUser({ uid: firebaseUser.uid, email: firebaseUser.email, name });
+        setUser({ uid: firebaseUser.uid, email: firebaseUser.email, name: firebaseUser.displayName });
       } else {
         setUser(null);
       }
     });
-
-    return () => unsubscribe();
+    return () => unsub();
   }, []);
 
   const logout = async () => {
@@ -26,7 +24,7 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, logout }}>
+    <UserContext.Provider value={{ user, logout }}>
       {children}
     </UserContext.Provider>
   );

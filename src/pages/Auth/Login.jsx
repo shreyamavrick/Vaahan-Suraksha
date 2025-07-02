@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase/config";
 
@@ -7,6 +7,11 @@ const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // where to go after login
+  const from = location.state?.from || "/services";
+  const autoAddService = location.state?.addService;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -16,8 +21,13 @@ const Login = () => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, form.email, form.password);
-      navigate("/");
-    } catch (err) {
+
+      // redirect back, passing autoAddService along
+      navigate(from, {
+        state: autoAddService ? { autoAddService } : {},
+        replace: true,
+      });
+    } catch {
       setError("Invalid credentials");
     }
   };
@@ -27,14 +37,14 @@ const Login = () => {
       <div className="max-w-md w-full bg-white shadow-md rounded-lg p-8">
         <h2 className="text-2xl font-bold mb-6 text-center">Sign In</h2>
         <form onSubmit={handleLogin} className="space-y-4">
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <p className="text-red-500">{error}</p>}
           <input
             type="email"
             name="email"
             placeholder="Email"
             value={form.email}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
+            className="w-full p-3 border rounded"
             required
           />
           <input
@@ -43,21 +53,15 @@ const Login = () => {
             placeholder="Password"
             value={form.password}
             onChange={handleChange}
-            className="w-full p-3 border border-gray-300 rounded"
+            className="w-full p-3 border rounded"
             required
           />
-          <button
-            type="submit"
-            className="w-full bg-[#49AEFE] hover:bg-blue-600 text-white py-3 rounded transition"
-          >
+          <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded">
             Log In
           </button>
           <p className="text-center text-sm mt-3">
             Don't have an account?{" "}
-            <span
-              onClick={() => navigate("/signup")}
-              className="text-blue-600 cursor-pointer hover:underline"
-            >
+            <span onClick={() => navigate("/signup")} className="text-blue-600 cursor-pointer">
               Sign Up
             </span>
           </p>
