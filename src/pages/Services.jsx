@@ -15,7 +15,7 @@ const Services = () => {
 
   const manufacturer = locationData.state?.manufacturer || "Brand";
   const model = locationData.state?.model || "Model";
-
+    
   // auto‑add if coming from login
   useEffect(() => {
     const auto = locationData.state?.autoAddService;

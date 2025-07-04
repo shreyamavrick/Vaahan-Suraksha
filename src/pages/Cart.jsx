@@ -70,46 +70,53 @@ const Cart = () => {
           ))}
         </div>
 
-        {/* Order Summary */}
-        <div className="w-full md:w-80 bg-white rounded-lg shadow p-6 space-y-4">
-          <h2 className="text-xl font-semibold">Order Summary</h2>
-          <div className="flex justify-between">
-            <span>Subtotal</span>
-            <span>₹{subtotal.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Shipping</span>
-            <span>₹{SHIPPING.toFixed(2)}</span>
-          </div>
+        {/* Order Summary - only if cart is not empty */}
+        {cartItems.length > 0 && (
+          <div className="w-full md:w-80 bg-white rounded-lg shadow p-6 space-y-4">
+            <h2 className="text-xl font-semibold">Order Summary</h2>
 
-          <div className="mt-2">
-            <input
-              type="text"
-              placeholder="Enter promo code"
-              value={promo}
-              onChange={(e) => setPromo(e.target.value)}
-              className="w-full border rounded px-3 py-2 text-sm"
-            />
-            <button className="mt-2 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-              Apply
+            <div className="flex justify-between">
+              <span>Subtotal</span>
+              <span>₹{subtotal.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Shipping</span>
+              <span>₹{SHIPPING.toFixed(2)}</span>
+            </div>
+
+            <div className="mt-2">
+              <input
+                type="text"
+                placeholder="Enter promo code"
+                value={promo}
+                onChange={(e) => setPromo(e.target.value)}
+                className="w-full border rounded px-3 py-2 text-sm"
+              />
+              <button className="mt-2 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                Apply
+              </button>
+            </div>
+
+            <div className="flex justify-between font-bold text-lg pt-4 border-t">
+              <span>Total</span>
+              <span>₹{total.toFixed(2)}</span>
+            </div>
+
+            <button
+              onClick={() => navigate("/checkout")}
+              className="w-full bg-red-600 text-white py-3 rounded hover:bg-red-700"
+            >
+              Proceed to Checkout
+            </button>
+
+            <button
+              onClick={() => navigate("/services")}
+              className="w-full border border-gray-300 py-3 rounded hover:bg-gray-100"
+            >
+              Continue Shopping
             </button>
           </div>
-
-          <div className="flex justify-between font-bold text-lg pt-4 border-t">
-            <span>Total</span>
-            <span>₹{total.toFixed(2)}</span>
-          </div>
-
-          <button className="w-full bg-red-600 text-white py-3 rounded hover:bg-red-700">
-            Proceed to Checkout
-          </button>
-          <button
-            onClick={() => navigate("/services")}
-            className="w-full border border-gray-300 py-3 rounded hover:bg-gray-100"
-          >
-            Continue Shopping
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );

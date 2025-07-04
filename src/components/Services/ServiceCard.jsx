@@ -29,7 +29,7 @@ const ServiceCard = ({ data, categoryName }) => {
         <img
           src={data.imageUrl}
           alt={data.name}
-          className="w-full h-48 object-cover"
+          className="w-full h-full object-cover"
         />
       </div>
 

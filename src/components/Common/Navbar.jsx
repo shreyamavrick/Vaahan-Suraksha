@@ -1,7 +1,7 @@
 import { Menu, X, PhoneCall, Home, Info, Book, Phone, Briefcase } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import logo from "../../assets/logo.avif";
+import logo from "../../assets/logo.png";
 import { navItems } from "../../constants";
 import { useUser } from "../../context/UserContext";
 import { signOut } from "firebase/auth";
@@ -32,7 +32,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
           <Link to="/">
             <img
-              className="h-14 w-auto hover:scale-105 transition-transform duration-300"
+              className="h-20 w-auto hover:scale-105 transition-transform duration-300"
               src={logo}
               alt="Logo"
             />
