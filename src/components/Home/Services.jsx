@@ -11,7 +11,7 @@ const services = [
     title: 'Batteries',
     desc: 'Battery replacement and maintenance services',
     image: BatteryImg,
-    link: '/services/batteries',
+    link: '/services/batteries', 
   },
   {
     title: 'Detailing Services',

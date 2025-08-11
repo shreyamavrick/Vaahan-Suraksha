@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BookOpen } from "lucide-react";
-import carTeam from "../../assets/car-team.png"; // update path as per your project
+import carTeam from "../../assets/car-team.png"; 
 
 const tabData = [
   {

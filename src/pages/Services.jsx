@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import ResponsiveCategoryBar from "../components/Services/ResponsiveCategoryBar";
-import categoriesData from "../data/categoriesData";
 import CategorySection from "../components/Services/CategorySection";
 import { Pencil, ShoppingCart } from "lucide-react";
 import { useCart } from "../context/cartContext";
@@ -15,18 +14,42 @@ const Services = () => {
 
   const manufacturer = locationData.state?.manufacturer || "Brand";
   const model = locationData.state?.model || "Model";
-    
-  // auto‑add if coming from login
+
   useEffect(() => {
     const auto = locationData.state?.autoAddService;
     if (auto && !isInCart(auto.id)) addToCart(auto);
   }, [locationData.state]);
 
-  const [selectedCategoryId, setSelectedCategoryId] = useState(categoriesData[0].id);
-  const selectedCategory = categoriesData.find((c) => c.id === selectedCategoryId);
+  
+  const [categoriesData, setCategoriesData] = useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+
+  useEffect(() => {
+    fetch("https://vaahan-suraksha-backend.vercel.app/api/v1/service/")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          
+          const formatted = data.data.map((item, index) => ({
+            id: item._id,
+            name: item.name,
+            packages: item.packages,
+          }));
+          setCategoriesData(formatted);
+          if (formatted.length > 0) {
+            setSelectedCategoryId(formatted[0].id);
+          }
+        }
+      })
+      .catch((err) => console.error("Error fetching services:", err));
+  }, []);
+
+  const selectedCategory = categoriesData.find(
+    (c) => c.id === selectedCategoryId
+  );
 
   if (!selectedCategory) {
-    return <p className="p-4">Category not found.</p>;
+    return <p className="p-4">Loading services...</p>;
   }
 
   return (
@@ -44,10 +67,16 @@ const Services = () => {
             className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-red-700"
           >
             <Pencil className="w-4 h-4" />
-            <span>{manufacturer} - {model}</span>
+            <span>
+              {manufacturer} - {model}
+            </span>
           </div>
           <button
-            onClick={() => navigate(user ? "/cart" : "/login", { state: { from: "/services" } })}
+            onClick={() =>
+              navigate(user ? "/cart" : "/login", {
+                state: { from: "/services" },
+              })
+            }
             className="relative p-2 bg-white rounded-full shadow hover:shadow-md"
           >
             <ShoppingCart className="w-5 h-5" />

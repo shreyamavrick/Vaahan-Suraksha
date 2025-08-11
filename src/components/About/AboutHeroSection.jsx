@@ -1,7 +1,7 @@
 import React from "react";
 import aboutBg from "../../assets/about-bg.jpg";
 
-const AboutHeroSection = () => {
+const AboutHeroSection = () => {        
   return (
     <div
       className="relative h-[400px] w-full bg-cover bg-center flex items-center justify-center text-white"

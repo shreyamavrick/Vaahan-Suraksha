@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-
 import hero_img_1 from "../../assets/hero_img_1.jpg";
 import hero_img_2 from "../../assets/hero_img_2.jpg";
+import vehicleData from "../../data/vehicle_data.json";
 
 const logo = "/logo.avif";
 
@@ -31,25 +30,11 @@ const HeroSection = () => {
   const [step, setStep] = useState(1);
   const [location, setLocation] = useState("");
   const [mobile, setMobile] = useState("");
-
- 
-  const [brands, setBrands] = useState([]);
-  const [models, setModels] = useState([]);
-  const [selectedBrandId, setSelectedBrandId] = useState("");
   const [manufacturer, setManufacturer] = useState("");
   const [model, setModel] = useState("");
   const [fuel, setFuel] = useState("");
-
   const [showSplash, setShowSplash] = useState(true);
   const [errors, setErrors] = useState({});
-
- 
-  const fuelTypes = [
-    { type: "Petrol" },
-    { type: "Diesel" },
-    { type: "CNG" },
-    { type: "Electric" },
-  ];
 
   const detectLocation = () => {
     navigator.geolocation.getCurrentPosition((position) => {
@@ -70,32 +55,6 @@ const HeroSection = () => {
     };
   }, []);
 
-  
-  useEffect(() => {
-    if (step === 2 && brands.length === 0) {
-      axios
-        .get("https://vaahan-suraksha-backend.vercel.app/api/v1/car/brand/")
-        .then((res) => {
-          setBrands(res.data.data || []);
-        })
-        .catch((err) => console.error("Error fetching brands:", err));
-    }
-  }, [step]);
-
-  
-  useEffect(() => {
-    if (selectedBrandId) {
-      axios
-        .get(
-          `https://vaahan-suraksha-backend.vercel.app/api/v1/car/model/${selectedBrandId}`
-        )
-        .then((res) => {
-          setModels(res.data.data || []);
-        })
-        .catch((err) => console.error("Error fetching models:", err));
-    }
-  }, [selectedBrandId]);
-
   const handleNext = () => {
     const newErrors = {};
 
@@ -112,35 +71,30 @@ const HeroSection = () => {
   };
 
   const handleSubmit = () => {
-    const newErrors = {};
-    if (!fuel) newErrors.fuel = "Please select a fuel type";
+  const newErrors = {};
+  if (!fuel) newErrors.fuel = "Please select a fuel type";
 
-    setErrors(newErrors);
+  setErrors(newErrors);
 
-    if (Object.keys(newErrors).length === 0) {
-      navigate("/services", {
-        state: {
-          location,
-          mobile,
-          manufacturer,
-          model,
-          fuel,
-        },
-      });
-    }
-  };
+  if (Object.keys(newErrors).length === 0) {
+    navigate("/services", {
+      state: {
+        location,
+        mobile,
+        manufacturer,
+        model,
+        fuel,
+      },
+    });
+  }
+};
+
 
   if (showSplash) {
     return (
       <div className="w-full h-screen bg-white flex flex-col items-center justify-center">
-        <img
-          src={logo}
-          alt="AutoCare Logo"
-          className="w-24 h-24 mb-4 animate-pulse"
-        />
-        <p className="text-xl font-semibold text-gray-700 animate-fade-in">
-          AutoCare
-        </p>
+        <img src={logo} alt="AutoCare Logo" className="w-24 h-24 mb-4 animate-pulse" />
+        <p className="text-xl font-semibold text-gray-700 animate-fade-in">AutoCare</p>
       </div>
     );
   }
@@ -159,7 +113,7 @@ const HeroSection = () => {
             style={{ backgroundImage: `url(${slide.image})` }}
           >
             <div className="absolute inset-0 bg-black/35 flex flex-col md:flex-row items-center justify-center px-4 md:px-12 py-6 overflow-y-auto">
-              {/* Left text */}
+              
               <div className="text-white text-center md:text-left w-full md:w-1/2 mb-8 md:mb-0">
                 <p className="text-sm font-medium uppercase tracking-wider mb-2">
                   {slide.tagline}
@@ -178,7 +132,7 @@ const HeroSection = () => {
                 </button>
               </div>
 
-              {/* Right form */}
+              {/* Multi-step Form */}
               <div className="bg-white rounded-xl shadow-xl p-6 w-full md:w-1/2 max-w-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">
                   Get instant quotes for your car service
@@ -202,11 +156,7 @@ const HeroSection = () => {
                       onChange={(e) => setLocation(e.target.value)}
                       className="w-full mb-1 p-2 border border-gray-300 rounded"
                     />
-                    {errors.location && (
-                      <p className="text-red-500 text-sm mb-2">
-                        {errors.location}
-                      </p>
-                    )}
+                    {errors.location && <p className="text-red-500 text-sm mb-2">{errors.location}</p>}
 
                     <input
                       type="tel"
@@ -215,11 +165,7 @@ const HeroSection = () => {
                       onChange={(e) => setMobile(e.target.value)}
                       className="w-full mb-1 p-2 border border-gray-300 rounded"
                     />
-                    {errors.mobile && (
-                      <p className="text-red-500 text-sm mb-2">
-                        {errors.mobile}
-                      </p>
-                    )}
+                    {errors.mobile && <p className="text-red-500 text-sm mb-2">{errors.mobile}</p>}
 
                     <button
                       onClick={handleNext}
@@ -234,12 +180,11 @@ const HeroSection = () => {
                   <>
                     <p className="font-semibold mb-2">Select Manufacturer</p>
                     <div className="grid grid-cols-3 gap-4 max-h-60 overflow-y-auto">
-                      {brands.map((brand) => (
+                      {vehicleData.manufacturers.map((brand) => (
                         <div
-                          key={brand._id}
+                          key={brand.name}
                           onClick={() => {
                             setManufacturer(brand.name);
-                            setSelectedBrandId(brand._id);
                             setStep(3);
                           }}
                           className="cursor-pointer text-center bg-gray-100 px-3 py-2 rounded hover:scale-105 transition"
@@ -255,18 +200,20 @@ const HeroSection = () => {
                   <>
                     <p className="font-semibold mb-2">Select Model</p>
                     <div className="grid grid-cols-3 gap-4 max-h-60 overflow-y-auto">
-                      {models.map((m) => (
-                        <div
-                          key={m._id}
-                          onClick={() => {
-                            setModel(m.name);
-                            setStep(4);
-                          }}
-                          className="cursor-pointer text-center bg-gray-100 px-3 py-2 rounded hover:scale-105 transition"
-                        >
-                          {m.name}
-                        </div>
-                      ))}
+                      {vehicleData.manufacturers
+                        .find((v) => v.name === manufacturer)
+                        ?.models.map((m) => (
+                          <div
+                            key={m.name}
+                            onClick={() => {
+                              setModel(m.name);
+                              setStep(4);
+                            }}
+                            className="cursor-pointer text-center bg-gray-100 px-3 py-2 rounded hover:scale-105 transition"
+                          >
+                            {m.name}
+                          </div>
+                        ))}
                     </div>
                   </>
                 )}
@@ -274,20 +221,14 @@ const HeroSection = () => {
                 {step === 4 && (
                   <>
                     <p className="font-semibold mb-2">Select Fuel Type</p>
-                    {errors.fuel && (
-                      <p className="text-red-500 text-sm mb-2">
-                        {errors.fuel}
-                      </p>
-                    )}
+                    {errors.fuel && <p className="text-red-500 text-sm mb-2">{errors.fuel}</p>}
                     <div className="grid grid-cols-2 gap-4">
-                      {fuelTypes.map((f) => (
+                      {vehicleData.fuelTypes.map((f) => (
                         <div
                           key={f.type}
                           onClick={() => setFuel(f.type)}
                           className={`cursor-pointer p-2 text-center border rounded text-sm font-medium ${
-                            fuel === f.type
-                              ? "border-blue-500 bg-blue-50"
-                              : "border-gray-200"
+                            fuel === f.type ? "border-blue-500 bg-blue-50" : "border-gray-200"
                           }`}
                         >
                           {f.type}
@@ -308,7 +249,7 @@ const HeroSection = () => {
         </div>
       ))}
 
-      {/* Slider Dots */}
+      
       <div className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 flex-col gap-4">
         {slides.map((_, index) => (
           <button

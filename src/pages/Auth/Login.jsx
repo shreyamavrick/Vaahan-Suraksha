@@ -9,7 +9,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // where to go after login
+  
   const from = location.state?.from || "/services";
   const autoAddService = location.state?.addService;
 
@@ -22,7 +22,7 @@ const Login = () => {
     try {
       await signInWithEmailAndPassword(auth, form.email, form.password);
 
-      // redirect back, passing autoAddService along
+      
       navigate(from, {
         state: autoAddService ? { autoAddService } : {},
         replace: true,
