@@ -127,12 +127,16 @@ const Navbar = () => {
 
               {/* Profile in Mobile Menu */}
               {user && (
-                <div className="flex items-center gap-3 mt-6 px-4">
+                <Link
+                  to="/profile"
+                  onClick={() => setMobileDrawerOpen(false)}
+                  className="flex items-center gap-3 mt-6 px-4"
+                >
                   <UserIcon size={28} className="text-gray-700" />
                   <span className="text-sm font-semibold text-gray-700">
                     {user.name || user.fullName || user.email}
                   </span>
-                </div>
+                </Link>
               )}
 
               {/* Auth Button in Mobile Menu */}
