@@ -24,7 +24,7 @@ const Navbar = () => {
     { label: "Home", href: "/", icon: <Home size={20} /> },
     { label: "About", href: "/about", icon: <Info size={20} /> },
     { label: "Contact", href: "/contact", icon: <Phone size={20} /> },
-    { label: "Services", href: "/services", icon: <Briefcase size={20} /> },
+    { label: "Services", href: "/allservices", icon: <Briefcase size={20} /> },
   ];
 
   return (

@@ -23,7 +23,7 @@ const Pricing = () => {
 
   return (
     <section className="py-20 bg-[#f4f7fa]">
-      <div className="text-center mb-12 max-w-2xl mx-auto">
+      <div className="text-center mb-12 max-w-2xl mx-auto px-4">
         <h2 className="text-3xl sm:text-5xl font-bold tracking-wide">
           The best <span className="text-blue-500">pricing</span> to help you!
         </h2>
@@ -32,41 +32,51 @@ const Pricing = () => {
         </p>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-6 px-4">
-        {plans.map((plan, index) => (
+      <div className="flex flex-wrap gap-8 justify-center px-4">
+        {plans.map((plan) => (
           <div
-            key={plan._id || index}
-            className={`w-full sm:w-[300px] md:w-[320px] lg:w-[350px] bg-white p-8 rounded-2xl shadow-xl transition-transform hover:scale-105`}
+            key={plan._id}
+            className="flex flex-col justify-between min-w-[300px] max-w-[350px] bg-white p-8 rounded-2xl shadow-lg border border-gray-100 transition-transform hover:scale-105"
           >
-            
-            <h3 className="text-xl font-semibold mb-4">{plan.name}</h3>
+            {/* Title */}
+            <h3 className="text-xl font-semibold mb-2">{plan.name}</h3>
 
-           
-            <p className="text-4xl font-bold mb-1">
-              ₹{plan.pricing?.["1"]?.monthlyPrice || "N/A"}
-            </p>
-            <p className="text-sm text-neutral-400 mb-6">
-              / {plan.duration} {plan.durationUnit}
-            </p>
+            {/* Price */}
+            <div className="mb-4">
+              <p className="text-4xl font-bold text-black">
+                ₹{plan.pricing?.["1"]?.monthlyPrice || "N/A"}
+              </p>
+              <p className="text-sm text-neutral-400">
+                / {plan.duration} {plan.durationUnit}
+              </p>
+            </div>
 
-           
-            <ul className="space-y-4 mb-10">
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-blue-500" />
-                <span>Limit: {plan.limit} services</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-blue-500" />
-                <span>Active: {plan.active ? "Yes" : "No"}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-blue-500" />
-                <span>Subscribers: {plan.currentSubscribers.length}</span>
-              </li>
-            </ul>            
+            {/* Limit above services */}
+            <div className="flex items-center gap-2 text-blue-600 mb-4">
+              <CheckCircle2 className="w-5 h-5" />
+              <span className="text-sm font-medium">
+                Limit: {plan.limit} 
+              </span>
+            </div>
+
+            {/* Services */}
+            <div className="mb-6">
+              <h4 className="font-medium mb-2">Included Services:</h4>
+              <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
+                {plan.services?.length > 0 ? (
+                  plan.services.map((service) => (
+                    <li key={service._id}>{service.name}</li>
+                  ))
+                ) : (
+                  <li>No services available</li>
+                )}
+              </ul>
+            </div>
+
+            {/* Button */}
             <a
               href="#"
-              className={`block text-center w-full py-3 rounded-lg font-medium border border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white transition`}
+              className="mt-auto block text-center w-full py-3 rounded-lg font-medium border border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white transition"
             >
               Purchase Now
             </a>

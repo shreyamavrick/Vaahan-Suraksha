@@ -117,7 +117,7 @@ const HeroSection = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      navigate("/services", {
+      navigate("/allservices", {
         state: {
           location,
           mobile,
