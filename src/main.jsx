@@ -7,7 +7,7 @@ import { UserProvider } from "./context/UserContext";
 import { CartProvider } from "./context/cartContext";
 import { VehicleProvider } from "./context/vehicleContext";
 
-createRoot(document.getElementById("root")).render(
+createRoot(document.getElementById("root")).render( 
   <StrictMode>
     <UserProvider>
       <CartProvider>

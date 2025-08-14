@@ -1,30 +1,43 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { auth } from "../firebase/config";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [auth, setAuth] = useState(null);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        setUser({ uid: firebaseUser.uid, email: firebaseUser.email, name: firebaseUser.displayName });
-      } else {
-        setUser(null);
+    const saved = localStorage.getItem("auth");
+    if (saved) {
+      try {
+        setAuth(JSON.parse(saved));
+      } catch {
+        localStorage.removeItem("auth");
       }
-    });
-    return () => unsub();
+    }
   }, []);
 
-  const logout = async () => {
-    await signOut(auth);
-    setUser(null);
+  const login = (authPayload) => {
+    setAuth(authPayload);
+    localStorage.setItem("auth", JSON.stringify(authPayload));
   };
 
+  const logout = () => {
+    setAuth(null);
+    localStorage.removeItem("auth");
+  };
+
+  const user = auth?.user || null;
+
   return (
-    <UserContext.Provider value={{ user, logout }}>
+    <UserContext.Provider
+      value={{
+        user,
+        auth,
+        isAuthenticated: !!auth?.accessToken,
+        login,
+        logout,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );

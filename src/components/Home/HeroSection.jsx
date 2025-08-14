@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
 import hero_img_1 from "../../assets/hero_img_1.jpg";
 import hero_img_2 from "../../assets/hero_img_2.jpg";
 
@@ -159,7 +158,7 @@ const HeroSection = () => {
             style={{ backgroundImage: `url(${slide.image})` }}
           >
             <div className="absolute inset-0 bg-black/35 flex flex-col md:flex-row items-center justify-center px-4 md:px-12 py-6 overflow-y-auto">
-              {/* Left text */}
+             
               <div className="text-white text-center md:text-left w-full md:w-1/2 mb-8 md:mb-0">
                 <p className="text-sm font-medium uppercase tracking-wider mb-2">
                   {slide.tagline}
@@ -178,7 +177,7 @@ const HeroSection = () => {
                 </button>
               </div>
 
-              {/* Right form */}
+             
               <div className="bg-white rounded-xl shadow-xl p-6 w-full md:w-1/2 max-w-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">
                   Get instant quotes for your car service
@@ -308,7 +307,7 @@ const HeroSection = () => {
         </div>
       ))}
 
-      {/* Slider Dots */}
+      
       <div className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 flex-col gap-4">
         {slides.map((_, index) => (
           <button

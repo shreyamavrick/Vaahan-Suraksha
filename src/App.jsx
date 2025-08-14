@@ -9,6 +9,7 @@ import Signup from "./pages/Auth/Signup";
 import Login from "./pages/Auth/Login";
 import Contact from "./pages/Contact";
 import Checkout from "./pages/Checkout";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/checkout" element={<Checkout/>}/>
+        <Route path="/profile" element={<Profile/>}/>
       </Routes>
       <Footer />
     </Router>
