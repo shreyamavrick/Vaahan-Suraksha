@@ -12,7 +12,7 @@ const Pricing = () => {
         );
         const data = await res.json();
         if (data.success) {
-          setPlans(data.data);
+          setPlans(data.data); 
         }
       } catch (error) {
         console.error("Error fetching subscription plans:", error);

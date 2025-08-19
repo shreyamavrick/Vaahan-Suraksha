@@ -129,20 +129,20 @@ const HeroSection = () => {
     }
   };
 
-  if (showSplash) {
-    return (
-      <div className="w-full h-screen bg-white flex flex-col items-center justify-center">
-        <img
-          src={logo}
-          alt="AutoCare Logo"
-          className="w-24 h-24 mb-4 animate-pulse"
-        />
-        <p className="text-xl font-semibold text-gray-700 animate-fade-in">
-          AutoCare
-        </p>
-      </div>
-    );
-  }
+  // if (showSplash) {
+  //   return (
+  //     <div className="w-full h-screen bg-white flex flex-col items-center justify-center">
+  //       <img
+  //         src={logo}
+  //         alt="AutoCare Logo"
+  //         className="w-24 h-24 mb-4 animate-pulse"
+  //       />
+  //       <p className="text-xl font-semibold text-gray-700 animate-fade-in">
+  //         AutoCare
+  //       </p>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="w-full h-screen relative overflow-hidden">

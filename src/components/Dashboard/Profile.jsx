@@ -206,85 +206,99 @@ export default function Profile() {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-12 bg-white rounded-2xl shadow-xl p-8">
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">My Profile</h2>
-      {message && (
-        <div className="mb-4 p-3 rounded-lg bg-green-100 text-green-800 text-sm flex items-center gap-2">
-          <span>✅</span> <span>{message}</span>
-        </div>
-      )}
-      {error && (
-        <div className="mb-4 p-3 rounded-lg bg-red-100 text-red-800 text-sm flex items-center gap-2">
-          <span>⚠️</span> <span>{error}</span>
-        </div>
-      )}
-      <form onSubmit={onSubmit} className="space-y-5">
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">Full name</label>
-          <input
-            name="name"
-            value={form.name}
-            onChange={onChange}
-            className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-            required
-          />
+    <div className="max-w-xl mx-auto mt-12 bg-white rounded-2xl shadow-lg overflow-hidden">
+      {/* Header with Avatar */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 flex items-center gap-4">
+        <div className="bg-white text-blue-600 font-bold rounded-full w-14 h-14 flex items-center justify-center text-xl shadow-md">
+          {user.name ? user.name[0].toUpperCase() : "U"}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
-          <input
-            name="email"
-            value={form.email}
-            disabled
-            className="w-full border px-4 py-2 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
-          />
+          <h2 className="text-white text-xl font-semibold">{user.name}</h2>
+          <p className="text-blue-100 text-sm">{user.email}</p>
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">Phone number</label>
-          <input
-            name="phoneNo"
-            value={form.phoneNo}
-            onChange={onChange}
-            className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">New password (optional)</label>
-          <input
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={onChange}
-            placeholder="Leave blank to keep existing password"
-            className="w-full border px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-          />
-        </div>
-        <div className="flex gap-3 justify-between pt-4">
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow transition disabled:opacity-60"
-          >
-            {loading ? "Updating..." : "Update Profile"}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setForm({
-                name: user.name || "",
-                email: user.email || "",
-                phoneNo: user.phoneNo || "",
-                password: "",
-              });
-              setMessage(null);
-              setError(null);
-            }}
-            className="flex-1 border border-gray-300 hover:bg-gray-100 px-4 py-2 rounded-lg font-medium transition"
-          >
-            Reset
-          </button>
-        </div>
-      </form>
+      </div>
+
+      {/* Form Content */}
+      <div className="p-8">
+        {message && (
+          <div className="mb-4 p-3 rounded-lg bg-green-50 text-green-700 text-sm flex items-center gap-2 border border-green-200">
+            <span>✅</span> <span>{message}</span>
+          </div>
+        )}
+        {error && (
+          <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm flex items-center gap-2 border border-red-200">
+            <span>⚠️</span> <span>{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={onSubmit} className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Full name</label>
+            <input
+              name="name"
+              value={form.name}
+              onChange={onChange}
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              name="email"
+              value={form.email}
+              disabled
+              className="w-full border border-gray-200 px-4 py-2 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Phone number</label>
+            <input
+              name="phoneNo"
+              value={form.phoneNo}
+              onChange={onChange}
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">New password (optional)</label>
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={onChange}
+              placeholder="Leave blank to keep existing password"
+              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+            />
+          </div>
+          <div className="flex gap-3 justify-between pt-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-md transition disabled:opacity-60"
+            >
+              {loading ? "Updating..." : "Update Profile"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setForm({
+                  name: user.name || "",
+                  email: user.email || "",
+                  phoneNo: user.phoneNo || "",
+                  password: "",
+                });
+                setMessage(null);
+                setError(null);
+              }}
+              className="flex-1 border border-gray-300 hover:bg-gray-50 px-4 py-2 rounded-lg font-medium transition"
+            >
+              Reset
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
