@@ -31,7 +31,6 @@ const HeroSection = () => {
   const [location, setLocation] = useState("");
   const [mobile, setMobile] = useState("");
 
- 
   const [brands, setBrands] = useState([]);
   const [models, setModels] = useState([]);
   const [selectedBrandId, setSelectedBrandId] = useState("");
@@ -42,7 +41,6 @@ const HeroSection = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [errors, setErrors] = useState({});
 
- 
   const fuelTypes = [
     { type: "Petrol" },
     { type: "Diesel" },
@@ -69,31 +67,35 @@ const HeroSection = () => {
     };
   }, []);
 
-  
   useEffect(() => {
     if (step === 2 && brands.length === 0) {
       axios
         .get("https://vaahan-suraksha-backend.vercel.app/api/v1/car/brand/")
-        .then((res) => {
-          setBrands(res.data.data || []);
-        })
+        .then((res) => setBrands(res.data.data || []))
         .catch((err) => console.error("Error fetching brands:", err));
     }
   }, [step]);
 
-  
   useEffect(() => {
     if (selectedBrandId) {
       axios
         .get(
           `https://vaahan-suraksha-backend.vercel.app/api/v1/car/model/${selectedBrandId}`
         )
-        .then((res) => {
-          setModels(res.data.data || []);
-        })
+        .then((res) => setModels(res.data.data || []))
         .catch((err) => console.error("Error fetching models:", err));
     }
   }, [selectedBrandId]);
+
+  const getBrandImage = (brandName) => {
+    const base = brandName.toLowerCase().replace(/\s+/g, "_");
+    return `/images/brands/${base}.png`;
+  };
+
+  const getModelImage = (modelName) => {
+    const base = modelName.toLowerCase().replace(/\s+/g, "_");
+    return `/images/models/${base}.png`;
+  };
 
   const handleNext = () => {
     const newErrors = {};
@@ -129,21 +131,6 @@ const HeroSection = () => {
     }
   };
 
-  // if (showSplash) {
-  //   return (
-  //     <div className="w-full h-screen bg-white flex flex-col items-center justify-center">
-  //       <img
-  //         src={logo}
-  //         alt="AutoCare Logo"
-  //         className="w-24 h-24 mb-4 animate-pulse"
-  //       />
-  //       <p className="text-xl font-semibold text-gray-700 animate-fade-in">
-  //         AutoCare
-  //       </p>
-  //     </div>
-  //   );
-  // }
-
   return (
     <div className="w-full h-screen relative overflow-hidden">
       {slides.map((slide, index) => (
@@ -158,7 +145,6 @@ const HeroSection = () => {
             style={{ backgroundImage: `url(${slide.image})` }}
           >
             <div className="absolute inset-0 bg-black/35 flex flex-col md:flex-row items-center justify-center px-4 md:px-12 py-6 overflow-y-auto">
-             
               <div className="text-white text-center md:text-left w-full md:w-1/2 mb-8 md:mb-0">
                 <p className="text-sm font-medium uppercase tracking-wider mb-2">
                   {slide.tagline}
@@ -177,7 +163,6 @@ const HeroSection = () => {
                 </button>
               </div>
 
-             
               <div className="bg-white rounded-xl shadow-xl p-6 w-full md:w-1/2 max-w-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">
                   Get instant quotes for your car service
@@ -243,6 +228,16 @@ const HeroSection = () => {
                           }}
                           className="cursor-pointer text-center bg-gray-100 px-3 py-2 rounded hover:scale-105 transition"
                         >
+                          <img
+                            src={getBrandImage(brand.name)}
+                            alt={brand.name}
+                            className="w-12 h-12 mx-auto mb-1"
+                            onError={(e) =>
+                              (e.target.src = `/images/brands/${brand.name
+                                .toLowerCase()
+                                .replace(/\s+/g, "_")}.jpeg`)
+                            }
+                          />
                           {brand.name}
                         </div>
                       ))}
@@ -263,6 +258,16 @@ const HeroSection = () => {
                           }}
                           className="cursor-pointer text-center bg-gray-100 px-3 py-2 rounded hover:scale-105 transition"
                         >
+                          <img
+                            src={getModelImage(m.name)}
+                            alt={m.name}
+                            className="w-12 h-12 mx-auto mb-1"
+                            onError={(e) =>
+                              (e.target.src = `/images/models/${m.name
+                                .toLowerCase()
+                                .replace(/\s+/g, "_")}.jpeg`)
+                            }
+                          />
                           {m.name}
                         </div>
                       ))}
@@ -307,7 +312,6 @@ const HeroSection = () => {
         </div>
       ))}
 
-      
       <div className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 flex-col gap-4">
         {slides.map((_, index) => (
           <button

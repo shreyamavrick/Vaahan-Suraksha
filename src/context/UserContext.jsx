@@ -19,11 +19,23 @@ export const UserProvider = ({ children }) => {
   const login = (authPayload) => {
     setAuth(authPayload);
     localStorage.setItem("auth", JSON.stringify(authPayload));
+
+    // ✅ Add these lines
+    if (authPayload.accessToken) {
+      localStorage.setItem("token", authPayload.accessToken);
+    }
+    if (authPayload.user) {
+      localStorage.setItem("user", JSON.stringify(authPayload.user));
+    }
   };
 
   const logout = () => {
     setAuth(null);
     localStorage.removeItem("auth");
+
+    // ✅ Remove token and user on logout
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
   };
 
   const user = auth?.user || null;

@@ -51,8 +51,18 @@ const Footer = () => {
 
         {/* COPYRIGHT */}
         <div className="text-center text-neutral-500 mt-10 text-sm">
-          Copyright © 2024 Vaahan Suraksha. All Rights Reserved.
-        </div>
+  Copyright © 2024 Vaahan Suraksha. Created by{" "}
+  <a
+    href="https://maverickservices.in/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-blue-500 hover:underline"
+  >
+    Maverick
+  </a>
+  . All Rights Reserved.
+</div>
+
       </div>
     </footer>
   );

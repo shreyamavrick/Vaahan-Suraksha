@@ -3,7 +3,7 @@ import axios from "axios";
 
 const API_BASE = "https://vaahan-suraksha-backend.vercel.app/api/v1";
 
-// --- keep your helper, unchanged ---
+/* ---------- unchanged helper ---------- */
 function readStoredSession() {
   const tryParse = (k) => {
     try {
@@ -39,6 +39,7 @@ function readStoredSession() {
   return { user: null, token: null };
 }
 
+/* ---------- Profile component (UI simplified) ---------- */
 export default function Profile() {
   const [initialLoaded, setInitialLoaded] = useState(false);
   const [user, setUser] = useState(null);
@@ -52,7 +53,13 @@ export default function Profile() {
       const { user: storedUser } = readStoredSession();
       if (storedUser) {
         const normalized = {
-          _id: storedUser._id || storedUser.id || storedUser._uid || storedUser.userId || storedUser.user_id || storedUser._id,
+          _id:
+            storedUser._id ||
+            storedUser.id ||
+            storedUser._uid ||
+            storedUser.userId ||
+            storedUser.user_id ||
+            storedUser._id,
           name: storedUser.name || storedUser.fullName || storedUser.displayName || storedUser.username || "",
           email: storedUser.email || storedUser.emailId || "",
           phoneNo: storedUser.phoneNo || storedUser.phone || storedUser.mobile || "",
@@ -70,7 +77,7 @@ export default function Profile() {
     } catch (err) {
       console.error("Error loading session", err);
     }
-    setInitialLoaded(true); // Always run!
+    setInitialLoaded(true);
   }, []);
 
   const onChange = (e) => setForm((s) => ({ ...s, [e.target.name]: e.target.value }));
@@ -187,7 +194,7 @@ export default function Profile() {
     }
   };
 
-  // --- UI Rendering ---
+  // ---------- SIMPLE CLEAN UI BELOW ----------
   if (!initialLoaded) {
     return (
       <div className="w-full flex justify-center items-center h-64">
@@ -198,7 +205,7 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div className="max-w-md mx-auto mt-20 p-6 bg-white rounded-lg shadow-lg text-center">
+      <div className="max-w-md mx-auto mt-20 p-6 bg-white rounded-lg shadow-sm text-center">
         <h2 className="text-2xl font-semibold mb-3">Profile</h2>
         <p className="text-gray-500">Please log in to view or edit your profile.</p>
       </div>
@@ -206,98 +213,106 @@ export default function Profile() {
   }
 
   return (
-    <div className="max-w-xl mx-auto mt-12 bg-white rounded-2xl shadow-lg overflow-hidden">
-      {/* Header with Avatar */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 flex items-center gap-4">
-        <div className="bg-white text-blue-600 font-bold rounded-full w-14 h-14 flex items-center justify-center text-xl shadow-md">
-          {user.name ? user.name[0].toUpperCase() : "U"}
+    <div className="max-w-lg mx-auto mt-12">
+      <div className="bg-white border border-gray-100 rounded-lg shadow-sm overflow-hidden">
+        {/* compact header (white, no gradient) */}
+        <div className="flex items-center gap-4 px-6 py-4">
+          <div className="flex-shrink-0">
+            <div className="bg-gray-100 text-gray-700 font-semibold rounded-full w-12 h-12 flex items-center justify-center text-lg">
+              {user.name ? user.name[0].toUpperCase() : "U"}
+            </div>
+          </div>
+          <div>
+            <div className="text-gray-900 font-medium text-lg">{user.name}</div>
+            <div className="text-sm text-gray-500">{user.email || "No email"}</div>
+          </div>
         </div>
-        <div>
-          <h2 className="text-white text-xl font-semibold">{user.name}</h2>
-          <p className="text-blue-100 text-sm">{user.email}</p>
+
+        <div className="border-t border-gray-100 px-6 py-6">
+          {message && (
+            <div className="mb-4 p-3 rounded-md bg-green-50 text-green-800 text-sm border border-green-100">
+              ✅ {message}
+            </div>
+          )}
+          {error && (
+            <div className="mb-4 p-3 rounded-md bg-red-50 text-red-800 text-sm border border-red-100">
+              ⚠️ {error}
+            </div>
+          )}
+
+          <form onSubmit={onSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Full name</label>
+              <input
+                name="name"
+                value={form.name}
+                onChange={onChange}
+                className="w-full border border-gray-200 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                name="email"
+                value={form.email}
+                disabled
+                className="w-full border border-gray-100 px-3 py-2 rounded-md bg-gray-50 text-gray-500 cursor-not-allowed"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Phone number</label>
+              <input
+                name="phoneNo"
+                value={form.phoneNo}
+                onChange={onChange}
+                className="w-full border border-gray-200 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">New password (optional)</label>
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={onChange}
+                placeholder="Leave blank to keep existing password"
+                className="w-full border border-gray-200 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              />
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md font-medium transition disabled:opacity-60"
+              >
+                {loading ? "Updating..." : "Update Profile"}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setForm({
+                    name: user.name || "",
+                    email: user.email || "",
+                    phoneNo: user.phoneNo || "",
+                    password: "",
+                  });
+                  setMessage(null);
+                  setError(null);
+                }}
+                className="flex-1 border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-md font-medium transition"
+              >
+                Reset
+              </button>
+            </div>
+          </form>
         </div>
-      </div>
-
-      {/* Form Content */}
-      <div className="p-8">
-        {message && (
-          <div className="mb-4 p-3 rounded-lg bg-green-50 text-green-700 text-sm flex items-center gap-2 border border-green-200">
-            <span>✅</span> <span>{message}</span>
-          </div>
-        )}
-        {error && (
-          <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm flex items-center gap-2 border border-red-200">
-            <span>⚠️</span> <span>{error}</span>
-          </div>
-        )}
-
-        <form onSubmit={onSubmit} className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Full name</label>
-            <input
-              name="name"
-              value={form.name}
-              onChange={onChange}
-              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              name="email"
-              value={form.email}
-              disabled
-              className="w-full border border-gray-200 px-4 py-2 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone number</label>
-            <input
-              name="phoneNo"
-              value={form.phoneNo}
-              onChange={onChange}
-              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">New password (optional)</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={onChange}
-              placeholder="Leave blank to keep existing password"
-              className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-            />
-          </div>
-          <div className="flex gap-3 justify-between pt-4">
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow-md transition disabled:opacity-60"
-            >
-              {loading ? "Updating..." : "Update Profile"}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setForm({
-                  name: user.name || "",
-                  email: user.email || "",
-                  phoneNo: user.phoneNo || "",
-                  password: "",
-                });
-                setMessage(null);
-                setError(null);
-              }}
-              className="flex-1 border border-gray-300 hover:bg-gray-50 px-4 py-2 rounded-lg font-medium transition"
-            >
-              Reset
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   );

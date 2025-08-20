@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   FaUser,
   FaClipboardList,
@@ -17,15 +17,28 @@ const menu = [
   { label: "Coins", to: "/dashboard/coins", icon: <FaDollarSign /> },
 ];
 
+// Extract initials (first letter of first 2 words in name)
+// Fallback: email first 2 letters, then "G"
+const getInitials = (name, email) => {
+  if (name) {
+    const parts = name.trim().split(" ").filter(Boolean);
+    if (parts.length === 1) return parts[0][0].toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  if (email) {
+    return email.slice(0, 2).toUpperCase();
+  }
+  return "G";
+};
+
 export default function DashboardLayout() {
+  const navigate = useNavigate();
   const { user, logout } = useUser();
 
-  // Get initials for avatar
-  const getInitials = (name) => {
-    if (!name) return "G"; // Guest fallback
-    const parts = name.split(" ");
-    if (parts.length === 1) return parts[0][0]; // Single name
-    return parts[0][0] + parts[1][0]; // First + last initial
+  // Enhanced logout: clear user and redirect
+  const handleLogout = () => {
+    logout();
+    navigate("/", { replace: true });
   };
 
   return (
@@ -33,11 +46,10 @@ export default function DashboardLayout() {
       {/* Sidebar */}
       <aside className="w-72 bg-white shadow-md flex flex-col">
         <div className="flex items-center gap-3 px-6 py-8 border-b">
-          {/* Avatar with initials */}
+          {/* Initials Only in circle */}
           <div className="bg-blue-100 rounded-full w-12 h-12 flex items-center justify-center text-lg font-bold text-blue-600 select-none">
-            {user?.name ? getInitials(user.name) : (user?.email ? user.email[0].toUpperCase() : "G")}
+            {getInitials(user?.name, user?.email)}
           </div>
-          {/* Name + welcome */}
           <div>
             <div className="font-semibold text-gray-800 text-base truncate max-w-[9rem]">
               {user?.name || user?.email || "Guest"}
@@ -71,7 +83,7 @@ export default function DashboardLayout() {
 
         {/* Logout */}
         <button
-          onClick={logout}
+          onClick={handleLogout}
           className="flex items-center gap-2 px-6 py-4 text-red-600 font-semibold hover:bg-gray-100 transition"
         >
           <FaSignOutAlt /> Logout
