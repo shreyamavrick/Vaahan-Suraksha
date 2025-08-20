@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   FaUser,
@@ -5,7 +6,9 @@ import {
   FaCar,
   FaMapMarkerAlt,
   FaDollarSign,
-  FaSignOutAlt
+  FaSignOutAlt,
+  FaBars,
+  FaChevronLeft
 } from "react-icons/fa";
 import { useUser } from "../../context/UserContext";
 
@@ -16,7 +19,6 @@ const menu = [
   { label: "Addresses", to: "/dashboard/addresses", icon: <FaMapMarkerAlt /> },
   { label: "Coins", to: "/dashboard/coins", icon: <FaDollarSign /> },
 ];
-
 
 const getInitials = (name, email) => {
   if (name) {
@@ -33,8 +35,8 @@ const getInitials = (name, email) => {
 export default function DashboardLayout() {
   const navigate = useNavigate();
   const { user, logout } = useUser();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Enhanced logout: clear user and redirect
   const handleLogout = () => {
     logout();
     navigate("/", { replace: true });
@@ -43,9 +45,22 @@ export default function DashboardLayout() {
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <aside className="w-72 bg-white shadow-md flex flex-col">
+      <aside
+        className={`fixed md:relative z-20 w-64 bg-white shadow-md flex flex-col h-full transition-transform transform ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0`}
+      >
+        {/* Close button for mobile */}
+        <div className="flex justify-end md:hidden p-4">
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="text-gray-600 hover:text-gray-900"
+          >
+            <FaChevronLeft size={20} />
+          </button>
+        </div>
+
         <div className="flex items-center gap-3 px-6 py-8 border-b">
-          {/* Initials Only in circle */}
           <div className="bg-blue-100 rounded-full w-12 h-12 flex items-center justify-center text-lg font-bold text-blue-600 select-none">
             {getInitials(user?.name, user?.email)}
           </div>
@@ -57,7 +72,6 @@ export default function DashboardLayout() {
           </div>
         </div>
 
-        {/* Menu */}
         <nav className="flex-1 py-6">
           <ul className="space-y-1">
             {menu.map((item) => (
@@ -71,6 +85,7 @@ export default function DashboardLayout() {
                         : "text-gray-700 hover:bg-gray-100"
                     }`
                   }
+                  onClick={() => setSidebarOpen(false)} // close sidebar on mobile
                 >
                   {item.icon}
                   {item.label}
@@ -80,7 +95,6 @@ export default function DashboardLayout() {
           </ul>
         </nav>
 
-        {/* Logout */}
         <button
           onClick={handleLogout}
           className="flex items-center gap-2 px-6 py-4 text-red-600 font-semibold hover:bg-gray-100 transition"
@@ -90,9 +104,24 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 p-6 md:p-12 bg-gray-50 min-h-screen">
-        <Outlet />
-      </main>
+      <div className="flex-1 flex flex-col">
+        {/* Mobile top bar */}
+        <div className="md:hidden flex items-center bg-white shadow p-4">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="text-gray-600 hover:text-gray-900"
+          >
+            <FaBars size={20} />
+          </button>
+          <span className="ml-4 font-semibold text-gray-800 text-lg">
+            Dashboard
+          </span>
+        </div>
+
+        <main className="flex-1 p-6 md:p-12 bg-gray-50 min-h-screen">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }
