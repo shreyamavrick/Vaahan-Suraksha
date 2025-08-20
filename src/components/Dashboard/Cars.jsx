@@ -1,314 +1,355 @@
-import React, { useEffect, useState } from "react";
-import { useUser } from "../../context/UserContext";
-import {
-  getUserCars,
-  addCar,
-  updateCar,
-  getBrands,
-  getModelsByBrand,
-} from "../../services/carApi";
+import { useEffect, useState } from "react";
 
-const initialForm = {
-  brand: "",
-  carModel: "",
-  transmission: "",
-  fuel: "",
-};
-
-export default function MyCarsPage() {
-  const { user, isAuthenticated } = useUser();
+const Cars = () => {
   const [brands, setBrands] = useState([]);
   const [models, setModels] = useState([]);
-  const [cars, setCars] = useState([]);
-  const [form, setForm] = useState(initialForm);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingCarId, setEditingCarId] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState("");
+  const [selectedModel, setSelectedModel] = useState("");
+  const [transmission, setTransmission] = useState("");
+  const [fuel, setFuel] = useState("");
+  const [userCar, setUserCar] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
-  // Redirect if not logged in
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setCars([]);
-      setLoading(false);
-      return;
-    }
-    // Fetch user's cars
-    const fetchCars = async () => {
-      setLoading(true);
-      try {
-        const userCars = await getUserCars();
-        setCars(userCars || []);
-      } catch (err) {
-        console.error(err);
-        setCars([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCars();
-  }, [isAuthenticated]);
+  const token = localStorage.getItem("token");
 
   // Fetch brands
-  useEffect(() => {
-    const fetchBrands = async () => {
-      try {
-        const b = await getBrands();
-        setBrands(b);
-      } catch {
-        setBrands([]);
-      }
-    };
-    fetchBrands();
-  }, []);
-
-  // Fetch models when brand changes
-  useEffect(() => {
-    if (!form.brand) {
-      setModels([]);
-      return;
-    }
-    const fetchModels = async () => {
-      try {
-        const m = await getModelsByBrand(form.brand);
-        setModels(m);
-      } catch {
-        setModels([]);
-      }
-    };
-    fetchModels();
-  }, [form.brand]);
-
-  const openAddModal = () => {
-    setForm(initialForm);
-    setEditingCarId(null);
-    setModalOpen(true);
-    setError("");
-  };
-
-  const openEditModal = (car) => {
-    setForm({
-      brand: car.brand?._id || car.brand || "",
-      carModel: car.carModel || "",
-      transmission: car.transmission || "",
-      fuel: car.fuel || "",
-    });
-    setEditingCarId(car._id);
-    setModalOpen(true);
-    setError("");
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
-    setEditingCarId(null);
-    setForm(initialForm);
-    setError("");
-  };
-
-  const onChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-
-    if (!isAuthenticated) {
-      setError("You must be logged in to add or edit cars.");
-      return;
-    }
-
-    if (!form.brand || !form.transmission || !form.fuel) {
-      setError("Please select brand, transmission and fuel.");
-      return;
-    }
-
-    setSaving(true);
+  const fetchBrands = async () => {
     try {
-      if (editingCarId) {
-        await updateCar({ carId: editingCarId, ...form });
-      } else {
-        await addCar(form);
-      }
-
-      // Refresh list
-      const updated = await getUserCars();
-      setCars(updated || []);
-      closeModal();
+      const res = await fetch(
+        "https://vaahan-suraksha-backend.vercel.app/api/v1/car/brand/"
+      );
+      const data = await res.json();
+      if (data.success) setBrands(data.data);
     } catch (err) {
       console.error(err);
-      setError(
-        err?.response?.data?.message || err?.message || "Failed to save car"
-      );
-    } finally {
-      setSaving(false);
     }
   };
 
-  // --- UI ---
-  if (!isAuthenticated) {
-    return (
-      <div className="max-w-md mx-auto mt-20 p-6 bg-white rounded-lg shadow text-center">
-        <h2 className="text-xl font-semibold mb-2">My Cars</h2>
-        <p className="text-gray-500">
-          You must log in to view or add cars.
-        </p>
-      </div>
-    );
-  }
+  // Fetch models by brand
+  const fetchModels = async (brandId) => {
+    if (!brandId) return [];
+    try {
+      const res = await fetch(
+        `https://vaahan-suraksha-backend.vercel.app/api/v1/car/model/${brandId}`
+      );
+      const data = await res.json();
+      if (data.success) return data.data;
+      return [];
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
+  };
+
+  // Fetch user car
+  const fetchUserCar = async () => {
+    try {
+      const res = await fetch(
+        "https://vaahan-suraksha-backend.vercel.app/api/v1/car/",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const data = await res.json();
+      if (data.success && data.data.length > 0) {
+        const car = data.data[0];
+        setSelectedBrand(car.brand?._id || "");
+        setTransmission(car.transmission || "");
+        setFuel(car.fuel || "");
+
+        // Fetch models of the brand
+        const modelsList = await fetchModels(car.brand?._id);
+        setModels(modelsList);
+
+        // Get correct model name
+        const carModelId = car.carModelId || car.brand?.car_models?.[0] || "";
+        setSelectedModel(carModelId);
+        const matchedModel = modelsList.find((m) => m._id === carModelId);
+
+        setUserCar({ ...car, modelName: matchedModel?.name || "N/A" });
+      } else {
+        setUserCar(null);
+        setSelectedBrand("");
+        setSelectedModel("");
+        setTransmission("");
+        setFuel("");
+        setModels([]);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // On component mount
+  useEffect(() => {
+    fetchBrands();
+    fetchUserCar();
+  }, []);
+
+  // Handle brand change
+  const handleBrandChange = async (brandId) => {
+    setSelectedBrand(brandId);
+    setSelectedModel("");
+    const modelsList = await fetchModels(brandId);
+    setModels(modelsList);
+  };
+
+  // Add car
+  const handleAddCar = async () => {
+    if (!selectedBrand || !selectedModel || !transmission || !fuel) {
+      alert("Please fill all fields!");
+      return;
+    }
+    try {
+      const res = await fetch(
+        "https://vaahan-suraksha-backend.vercel.app/api/v1/car/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            brandId: selectedBrand,
+            carModelId: selectedModel,
+            transmission,
+            fuel,
+          }),
+        }
+      );
+      const data = await res.json();
+      if (data.success) {
+        alert("Car added successfully!");
+        fetchUserCar();
+      } else alert(data.message || "Failed to add car");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Update car
+  const handleUpdateCar = async () => {
+    if (!selectedBrand || !selectedModel || !transmission || !fuel) {
+      alert("Please fill all fields!");
+      return;
+    }
+    try {
+      const res = await fetch(
+        "https://vaahan-suraksha-backend.vercel.app/api/v1/car/update",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            carId: userCar._id,
+            brandId: selectedBrand,
+            carModelId: selectedModel,
+            transmission,
+            fuel,
+          }),
+        }
+      );
+      const data = await res.json();
+      if (data.success) {
+        alert("Car updated successfully!");
+        setIsEditing(false);
+        fetchUserCar(); // ✅ REFRESH full car details to get brand & model name
+      } else alert(data.message || "Failed to update car");
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Delete car
+  const handleDeleteCar = async () => {
+    if (!userCar?._id) return;
+    try {
+      const res = await fetch(
+        "https://vaahan-suraksha-backend.vercel.app/api/v1/car/delete",
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ carId: userCar._id }),
+        }
+      );
+      const data = await res.json();
+      if (data.success) {
+        alert("Car deleted successfully!");
+        setUserCar(null);
+        setSelectedBrand("");
+        setSelectedModel("");
+        setTransmission("");
+        setFuel("");
+        setModels([]);
+        setIsEditing(false);
+      } else alert(data.message || "Failed to delete car");
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
-    <div className="max-w-xl mx-auto p-4">
-      <h1 className="text-2xl mb-4 font-bold">My Cars</h1>
-
-      {loading ? (
-        <div>Loading cars...</div>
-      ) : cars.length === 0 ? (
-        <div className="text-center">
-          <p className="mb-3">You haven't added any cars yet.</p>
-          <button
-            className="mt-2 bg-blue-600 text-white px-4 py-2 rounded"
-            onClick={openAddModal}
-          >
-            Add Car
-          </button>
-        </div>
-      ) : (
+    <div className="p-6">
+      {!userCar && !isEditing ? (
         <>
-          {cars.map((car) => (
-            <div
-              key={car._id}
-              className="border rounded px-4 py-2 mb-3 flex items-center justify-between"
-            >
-              <div>
-                <div className="font-medium">
-                  {car.brand?.name || "Brand"} {car.carModel && `- ${car.carModel}`}
-                </div>
-                <div className="text-sm text-gray-600">
-                  {car.transmission} {car.fuel && `• ${car.fuel}`}
-                </div>
-              </div>
+          <h2 className="text-xl font-bold mb-4">Add Car</h2>
+          <CarForm
+            brands={brands}
+            models={models}
+            selectedBrand={selectedBrand}
+            selectedModel={selectedModel}
+            transmission={transmission}
+            fuel={fuel}
+            handleBrandChange={handleBrandChange}
+            setSelectedBrand={setSelectedBrand}
+            setSelectedModel={setSelectedModel}
+            setTransmission={setTransmission}
+            setFuel={setFuel}
+            onSubmit={handleAddCar}
+            submitText="Add Car"
+          />
+        </>
+      ) : userCar && !isEditing ? (
+        <>
+          <h2 className="text-xl font-bold mb-4">My Car</h2>
+          <div className="border p-4 rounded shadow-sm">
+            <p>
+              <strong>Brand:</strong> {userCar.brand?.name}
+            </p>
+            <p>
+              <strong>Model:</strong> {userCar.modelName}
+            </p>
+            <p>
+              <strong>Transmission:</strong> {userCar.transmission}
+            </p>
+            <p>
+              <strong>Fuel:</strong> {userCar.fuel}
+            </p>
+            <div className="mt-4 flex gap-2">
               <button
-                onClick={() => openEditModal(car)}
-                className="border px-3 py-1 text-sm rounded"
+                className="bg-green-500 text-white px-4 py-2 rounded"
+                onClick={() => setIsEditing(true)}
               >
-                Edit
+                Update
+              </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded"
+                onClick={handleDeleteCar}
+              >
+                Delete
               </button>
             </div>
-          ))}
-          <button
-            className="mt-2 bg-blue-600 text-white px-4 py-2 rounded"
-            onClick={openAddModal}
-          >
-            Add New Car
-          </button>
-        </>
-      )}
-
-      {modalOpen && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-30">
-          <div className="bg-white rounded shadow-lg p-6 w-full max-w-md relative">
-            <h2 className="text-lg font-bold mb-4">
-              {editingCarId ? "Edit Car" : "Add Car"}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <div>
-                <label className="block text-sm mb-1">Brand</label>
-                <select
-                  name="brand"
-                  value={form.brand}
-                  onChange={onChange}
-                  className="w-full border p-2 rounded"
-                  required
-                >
-                  <option value="">— Select Brand —</option>
-                  {brands.map((b) => (
-                    <option key={b._id} value={b._id}>
-                      {b.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm mb-1">Model</label>
-                <select
-                  name="carModel"
-                  value={form.carModel}
-                  onChange={onChange}
-                  className="w-full border p-2 rounded"
-                  disabled={!form.brand}
-                >
-                  <option value="">— Select Model —</option>
-                  {models.map((m) => (
-                    <option key={m._id} value={m._id}>
-                      {m.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-sm mb-1">Transmission</label>
-                  <select
-                    name="transmission"
-                    value={form.transmission}
-                    onChange={onChange}
-                    className="w-full border p-2 rounded"
-                    required
-                  >
-                    <option value="">— Select —</option>
-                    <option value="Manual">Manual</option>
-                    <option value="Automatic">Automatic</option>
-                    <option value="AMT">AMT</option>
-                    <option value="CVT">CVT</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm mb-1">Fuel</label>
-                  <select
-                    name="fuel"
-                    value={form.fuel}
-                    onChange={onChange}
-                    className="w-full border p-2 rounded"
-                    required
-                  >
-                    <option value="">— Select —</option>
-                    <option value="Petrol">Petrol</option>
-                    <option value="Diesel">Diesel</option>
-                    <option value="CNG">CNG</option>
-                    <option value="Electric">Electric</option>
-                    <option value="Hybrid">Hybrid</option>
-                  </select>
-                </div>
-              </div>
-
-              {error && <div className="text-red-600 text-sm mt-1">{error}</div>}
-
-              <div className="flex gap-2 mt-3">
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded"
-                  disabled={saving}
-                >
-                  {saving ? (editingCarId ? "Updating..." : "Adding...") : editingCarId ? "Update" : "Add"}
-                </button>
-                <button
-                  type="button"
-                  className="border px-4 py-2 rounded"
-                  onClick={closeModal}
-                  disabled={saving}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
           </div>
-        </div>
+        </>
+      ) : (
+        <>
+          <h2 className="text-xl font-bold mb-4">Update Car</h2>
+          <CarForm
+            brands={brands}
+            models={models}
+            selectedBrand={selectedBrand}
+            selectedModel={selectedModel}
+            transmission={transmission}
+            fuel={fuel}
+            handleBrandChange={handleBrandChange}
+            setSelectedBrand={setSelectedBrand}
+            setSelectedModel={setSelectedModel}
+            setTransmission={setTransmission}
+            setFuel={setFuel}
+            onSubmit={handleUpdateCar}
+            submitText="Update Car"
+            onCancel={() => setIsEditing(false)}
+          />
+        </>
       )}
     </div>
   );
-}
+};
+
+const CarForm = ({
+  brands,
+  models,
+  selectedBrand,
+  selectedModel,
+  transmission,
+  fuel,
+  handleBrandChange,
+  setSelectedBrand,
+  setSelectedModel,
+  setTransmission,
+  setFuel,
+  onSubmit,
+  submitText,
+  onCancel,
+}) => (
+  <div className="grid grid-cols-2 gap-4 mb-4">
+    <select
+      value={selectedBrand}
+      onChange={(e) => handleBrandChange(e.target.value)}
+      className="border p-2 rounded"
+    >
+      <option value="">Select Brand</option>
+      {brands.map((b) => (
+        <option key={b._id} value={b._id}>
+          {b.name}
+        </option>
+      ))}
+    </select>
+
+    <select
+      value={selectedModel}
+      onChange={(e) => setSelectedModel(e.target.value)}
+      className="border p-2 rounded"
+    >
+      <option value="">Select Model</option>
+      {models.map((m) => (
+        <option key={m._id} value={m._id}>
+          {m.name}
+        </option>
+      ))}
+    </select>
+
+    <select
+      value={transmission}
+      onChange={(e) => setTransmission(e.target.value)}
+      className="border p-2 rounded"
+    >
+      <option value="">Select Transmission</option>
+      <option value="Automatic">Automatic</option>
+      <option value="Manual">Manual</option>
+    </select>
+
+    <select
+      value={fuel}
+      onChange={(e) => setFuel(e.target.value)}
+      className="border p-2 rounded"
+    >
+      <option value="">Select Fuel</option>
+      <option value="Petrol">Petrol</option>
+      <option value="Diesel">Diesel</option>
+      <option value="CNG">CNG</option>
+    </select>
+
+    <div className="col-span-2 flex gap-2 mt-2">
+      <button
+        onClick={onSubmit}
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+      >
+        {submitText}
+      </button>
+      {onCancel && (
+        <button
+          onClick={onCancel}
+          className="bg-gray-500 text-white px-4 py-2 rounded"
+        >
+          Cancel
+        </button>
+      )}
+    </div>
+  </div>
+);
+
+export default Cars;

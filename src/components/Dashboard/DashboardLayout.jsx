@@ -17,8 +17,7 @@ const menu = [
   { label: "Coins", to: "/dashboard/coins", icon: <FaDollarSign /> },
 ];
 
-// Extract initials (first letter of first 2 words in name)
-// Fallback: email first 2 letters, then "G"
+
 const getInitials = (name, email) => {
   if (name) {
     const parts = name.trim().split(" ").filter(Boolean);
