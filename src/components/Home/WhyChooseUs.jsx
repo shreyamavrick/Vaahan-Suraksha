@@ -15,7 +15,7 @@ const WhyChooseUs = () => {
             We carefully screen all of our cleaners, so you can rest assured that your home would receive the absolute highest quality of service providing. Ultricies tristique nulla aliquet enim tortor at auctor urna nunc.
           </p>
           <a
-            href="#"
+            href="/about"
             className="inline-flex items-center mt-8 px-6 py-3 text-white bg-[#49AEFE] rounded-full font-medium shadow hover:brightness-110 transition duration-300"
           >
             Learn More <span className="ml-2">↗</span>
