@@ -50,7 +50,6 @@ export default function DashboardLayout() {
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
-        {/* Close button for mobile */}
         <div className="flex justify-end md:hidden p-4">
           <button
             onClick={() => setSidebarOpen(false)}

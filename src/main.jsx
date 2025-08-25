@@ -5,7 +5,7 @@ import App from "./App.jsx";
 
 import { UserProvider } from "./context/UserContext";
 import { CartProvider } from "./context/cartContext";
-import { VehicleProvider } from "./context/vehicleContext";
+import { VehicleProvider } from "./context/vehicleContext.jsx";
 
 createRoot(document.getElementById("root")).render( 
   <StrictMode>

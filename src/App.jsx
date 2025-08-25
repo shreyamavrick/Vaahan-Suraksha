@@ -16,6 +16,7 @@ import Orders from "./components/Dashboard/Orders";
 import Cars from "./components/Dashboard/Cars";
 import Addresses from "./components/Dashboard/Addresses";
 import Coins from "./components/Dashboard/Coins";
+import Subscription from "./pages/Subscription"
 
 
 
@@ -33,6 +34,8 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/allservices" element={<AllServices />} />
+        <Route path="/subscription" element={<Subscription />} />
+
 
         
         <Route path="/dashboard" element={<DashboardLayout />} >

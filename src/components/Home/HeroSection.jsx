@@ -1,10 +1,10 @@
+// src/components/HeroSection.jsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useVehicle } from "../../context/vehicleContext"; // ✅ import context
 import hero_img_1 from "../../assets/hero_img_1.jpg";
 import hero_img_2 from "../../assets/hero_img_2.jpg";
-
-const logo = "/logo.avif";
 
 const slides = [
   {
@@ -25,6 +25,7 @@ const slides = [
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const { setVehicle } = useVehicle(); // ✅ use context
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [step, setStep] = useState(1);
@@ -38,7 +39,6 @@ const HeroSection = () => {
   const [model, setModel] = useState("");
   const [fuel, setFuel] = useState("");
 
-  const [showSplash, setShowSplash] = useState(true);
   const [errors, setErrors] = useState({});
 
   const fuelTypes = [
@@ -48,23 +48,11 @@ const HeroSection = () => {
     { type: "Electric" },
   ];
 
-  const detectLocation = () => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      setLocation(
-        `Lat: ${position.coords.latitude}, Lng: ${position.coords.longitude}`
-      );
-    });
-  };
-
   useEffect(() => {
-    const splashTimeout = setTimeout(() => setShowSplash(false), 2000);
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
-    return () => {
-      clearTimeout(splashTimeout);
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -99,12 +87,10 @@ const HeroSection = () => {
 
   const handleNext = () => {
     const newErrors = {};
-
     if (step === 1) {
       if (!location.trim()) newErrors.location = "City is required";
       if (!mobile.trim()) newErrors.mobile = "Mobile number is required";
     }
-
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
@@ -115,10 +101,20 @@ const HeroSection = () => {
   const handleSubmit = () => {
     const newErrors = {};
     if (!fuel) newErrors.fuel = "Please select a fuel type";
-
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
+      // ✅ Save to context + localStorage
+      setVehicle({
+        brand: manufacturer,
+        model,
+        id: selectedBrandId,
+        fuel,
+        location,
+        mobile,
+      });
+
+      // Redirect
       navigate("/allservices", {
         state: {
           location,
@@ -145,6 +141,7 @@ const HeroSection = () => {
             style={{ backgroundImage: `url(${slide.image})` }}
           >
             <div className="absolute inset-0 bg-black/35 flex flex-col md:flex-row items-center justify-center px-4 md:px-12 py-6 overflow-y-auto">
+              {/* Left Text Section */}
               <div className="text-white text-center md:text-left w-full md:w-1/2 mb-8 md:mb-0">
                 <p className="text-sm font-medium uppercase tracking-wider mb-2">
                   {slide.tagline}
@@ -163,6 +160,7 @@ const HeroSection = () => {
                 </button>
               </div>
 
+              {/* Right Form Section */}
               <div className="bg-white rounded-xl shadow-xl p-6 w-full md:w-1/2 max-w-md">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">
                   Get instant quotes for your car service
@@ -312,6 +310,7 @@ const HeroSection = () => {
         </div>
       ))}
 
+      {/* Slide Indicators */}
       <div className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 flex-col gap-4">
         {slides.map((_, index) => (
           <button
