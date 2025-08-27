@@ -1,8 +1,6 @@
-// src/pages/OrdersPage.jsx
 import { useState } from "react";
 
 const OrdersPage = () => {
-  // Dummy orders data
   const [orders] = useState([
     {
       id: "ORD123",
@@ -29,8 +27,6 @@ const OrdersPage = () => {
       price: "₹2,000",
     },
   ]);
-
-  // Helper: status color
   const getStatusColor = (status) => {
     switch (status) {
       case "Completed":
@@ -54,15 +50,12 @@ const OrdersPage = () => {
             key={order.id}
             className="bg-white shadow-md rounded-2xl p-5 flex flex-col md:flex-row md:items-center md:justify-between transition hover:shadow-lg"
           >
-            {/* Left: Service Info */}
             <div>
               <h2 className="text-lg font-semibold text-gray-800">{order.service}</h2>
               <p className="text-sm text-gray-600 mt-1">{order.car}</p>
               <p className="text-sm text-gray-500">Order ID: {order.id}</p>
               <p className="text-sm text-gray-500">Date: {order.date}</p>
             </div>
-
-            {/* Right: Status & Price */}
             <div className="flex flex-col items-start md:items-end mt-3 md:mt-0">
               <span
                 className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(

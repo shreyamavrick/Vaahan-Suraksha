@@ -6,7 +6,9 @@ const PLANS_URL = "https://vaahan-suraksha-backend.vercel.app/api/v1/service/sub
 const SERVICES_URL = "https://vaahan-suraksha-backend.vercel.app/api/v1/service/";
 
 const currency = (n) =>
-  typeof n === "number" ? n.toLocaleString("en-IN", { style: "currency", currency: "INR" }) : "—";
+  typeof n === "number"
+    ? n.toLocaleString("en-IN", { style: "currency", currency: "INR" })
+    : "—";
 
 export default function Checkout() {
   const [searchParams] = useSearchParams();
@@ -17,6 +19,7 @@ export default function Checkout() {
   const [servicesMap, setServicesMap] = useState({});
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
+  const [processing, setProcessing] = useState(false);
 
   const planId = searchParams.get("planId");
   const pricingKey = searchParams.get("pricingKey");
@@ -28,12 +31,9 @@ export default function Checkout() {
       setLoading(false);
       return;
     }
-
     const fetchAll = async () => {
       try {
         setLoading(true);
-
-        // Fetch all plans
         const plansRes = await fetch(PLANS_URL);
         const plansJson = await plansRes.json();
         if (!plansJson.success) throw new Error(plansJson.message || "Failed to load plans");
@@ -42,8 +42,6 @@ export default function Checkout() {
         if (!planData) throw new Error("Plan not found.");
 
         setPlan(planData);
-
-        // Fetch services for displaying names
         const servicesRes = await fetch(SERVICES_URL);
         const servicesJson = await servicesRes.json();
         if (!servicesJson.success) throw new Error(servicesJson.message || "Failed to load services");
@@ -63,16 +61,111 @@ export default function Checkout() {
     fetchAll();
   }, [planId]);
 
-  const handlePay = () => {
+  const handlePay = async () => {
     if (!isAuthenticated) {
-      navigate(`/login?redirect=/checkout?planId=${planId}&pricingKey=${pricingKey}&pricingType=${pricingType}`);
+      navigate(
+        `/login?redirect=/checkout?planId=${planId}&pricingKey=${pricingKey}&pricingType=${pricingType}`
+      );
       return;
     }
-    alert("Payment functionality not implemented yet.");
+    if (!plan) {
+      alert("Plan data missing");
+      return;
+    }
+    setProcessing(true);
+
+    try {
+      const token = localStorage.getItem("token");
+      const serviceIds = plan.services?.map((s) => (typeof s === "string" ? s : s._id));
+      const price = plan.pricing?.[pricingKey]?.[pricingType];
+      if (!price) {
+        alert("Pricing not found.");
+        setProcessing(false);
+        return;
+      }
+
+      const orderRes = await fetch(
+        "https://vaahan-suraksha-backend.vercel.app/api/v1/order/oneTime/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+          body: JSON.stringify({
+            planId,
+            pricingType,
+            amount: price,
+            serviceIds,
+          }),
+        }
+      );
+      const orderJson = await orderRes.json();
+      if (!orderJson.success) {
+        alert(orderJson.message || "Order creation failed");
+        setProcessing(false);
+        return;
+      }
+      const { razorpayOrderId, amount, currency, key, newOrderId } = orderJson.data;
+
+      const options = {
+        key,
+        amount, 
+        currency,
+        order_id: razorpayOrderId,
+        name: plan.name,
+        description: "Vaahan Suraksha Plan Purchase",
+        handler: async function (razorpayResponse) {
+        
+          const verifyRes = await fetch(
+            "https://vaahan-suraksha-backend.vercel.app/api/v1/order/oneTime/verify",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: token ? `Bearer ${token}` : "",
+              },
+              body: JSON.stringify({
+                razorpay_payment_id: razorpayResponse.razorpay_payment_id,
+                razorpay_order_id: razorpayResponse.razorpay_order_id,
+                razorpay_signature: razorpayResponse.razorpay_signature,
+                orderId: newOrderId,
+              }),
+            }
+          );
+          const verifyJson = await verifyRes.json();
+          console.log("API Response:", verifyJson);
+         
+          if (verifyJson.success) {
+            navigate("/dashboard/orders"); 
+          } else {
+            alert("Payment verification failed");
+          }
+        },
+        prefill: {},
+        theme: { color: "#2563eb" },
+        modal: { ondismiss: () => setProcessing(false) },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (e) {
+      alert(e.message || "Unexpected error. Try again.");
+    } finally {
+      setProcessing(false);
+    }
   };
 
-  if (loading) return <div className="min-h-[60vh] grid place-items-center animate-pulse">Loading checkout…</div>;
-  if (err) return <div className="min-h-[60vh] grid place-items-center text-red-600">{err}</div>;
+  if (loading)
+    return (
+      <div className="min-h-[60vh] grid place-items-center animate-pulse">
+        {"Loading checkout…"}
+      </div>
+    );
+  if (err)
+    return (
+      <div className="min-h-[60vh] grid place-items-center text-red-600">{err}</div>
+    );
 
   const selectedTier = plan.pricing?.[pricingKey];
   const price = selectedTier?.[pricingType];
@@ -81,16 +174,15 @@ export default function Checkout() {
     <section className="py-14 bg-gray-50">
       <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
         <h1 className="text-2xl font-bold mb-4">Checkout</h1>
-
         <div className="mb-6">
           <h2 className="text-lg font-semibold">Selected Plan</h2>
           <p className="text-gray-700 mt-1">{plan.name}</p>
           <p className="text-gray-500 text-sm">
-            Tier: {pricingKey} · {pricingType === "oneTimePrice" ? "One-time" : "Monthly"}
+            Tier: {pricingKey} ·{" "}
+            {pricingType === "oneTimePrice" ? "One-time" : "Monthly"}
           </p>
           <p className="text-lg font-semibold mt-2">{currency(price)}</p>
         </div>
-
         {plan.services?.length > 0 && (
           <div className="mb-6">
             <h2 className="text-lg font-semibold">Included Services</h2>
@@ -102,12 +194,12 @@ export default function Checkout() {
             </ul>
           </div>
         )}
-
         <button
           onClick={handlePay}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 font-semibold rounded-lg transition"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 font-semibold rounded-lg transition disabled:bg-gray-300"
+          disabled={processing}
         >
-          Proceed to Pay
+          {processing ? "Processing…" : "Proceed to Pay"}
         </button>
       </div>
     </section>

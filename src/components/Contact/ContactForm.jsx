@@ -4,7 +4,6 @@
       return (
         <section className="py-10 bg-white">
           <div className="w-[90%] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
-            {/* Left: Contact Info */}
             <div>
               <h2 className="text-4xl font-bold mb-4">Get In Touch</h2>
               <p className="text-gray-600 text-lg mb-6">
