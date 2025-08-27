@@ -7,7 +7,7 @@ const Orders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const token = localStorage.getItem("token"); // adjust if needed
+        const token = localStorage.getItem("token");
         const res = await axios.get(
           "https://vaahan-suraksha-backend.vercel.app/api/v1/order/my",
           {

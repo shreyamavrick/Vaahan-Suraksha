@@ -171,37 +171,45 @@ export default function Checkout() {
   const price = selectedTier?.[pricingType];
 
   return (
-    <section className="py-14 bg-gray-50">
-      <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
-        <h1 className="text-2xl font-bold mb-4">Checkout</h1>
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold">Selected Plan</h2>
-          <p className="text-gray-700 mt-1">{plan.name}</p>
-          <p className="text-gray-500 text-sm">
-            Tier: {pricingKey} ·{" "}
-            {pricingType === "oneTimePrice" ? "One-time" : "Monthly"}
-          </p>
-          <p className="text-lg font-semibold mt-2">{currency(price)}</p>
-        </div>
-        {plan.services?.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold">Included Services</h2>
-            <ul className="mt-2 list-disc list-inside text-gray-700">
-              {plan.services.map((s) => {
-                const name = typeof s === "string" ? servicesMap[s]?.name : s.name;
-                return <li key={typeof s === "string" ? s : s._id}>{name || "Unknown Service"}</li>;
-              })}
-            </ul>
-          </div>
-        )}
-        <button
-          onClick={handlePay}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 font-semibold rounded-lg transition disabled:bg-gray-300"
-          disabled={processing}
-        >
-          {processing ? "Processing…" : "Proceed to Pay"}
-        </button>
+  <section className="min-h-screen py-14 bg-gradient-to-b from-indigo-50 to-white flex justify-center px-4">
+    <div className="w-full max-w-3xl bg-white rounded-xl shadow-lg p-8 sm:p-12">
+      <h1 className="text-3xl font-extrabold mb-6 text-gray-900 text-center sm:text-left">Checkout</h1>
+
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold text-gray-800 mb-1">Selected Plan</h2>
+        <p className="text-gray-700 text-lg font-medium">{plan.name}</p>
+        <p className="text-sm text-gray-500 mt-1">
+          Tier: <span className="capitalize">{pricingKey}</span> &middot;{" "}
+          <span>{pricingType === "oneTimePrice" ? "One-time" : "Monthly"}</span>
+        </p>
+        <p className="mt-3 text-2xl font-bold text-indigo-600">{currency(price)}</p>
       </div>
-    </section>
-  );
+
+      {plan.services?.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-800 mb-3">Included Services</h2>
+          <ul className="list-disc list-inside space-y-1 text-gray-700 leading-relaxed text-base max-h-60 overflow-auto">
+            {plan.services.map((s) => {
+              const name = typeof s === "string" ? servicesMap[s]?.name : s.name;
+              return (
+                <li key={typeof s === "string" ? s : s._id} className="hover:text-indigo-600 transition-colors">
+                  {name || "Unknown Service"}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      <button
+        onClick={handlePay}
+        disabled={processing}
+        className="w-full bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-400 focus:outline-none text-white font-semibold py-3 rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed"
+      >
+        {processing ? "Processing…" : "Proceed to Pay"}
+      </button>
+    </div>
+  </section>
+);
+
 }
