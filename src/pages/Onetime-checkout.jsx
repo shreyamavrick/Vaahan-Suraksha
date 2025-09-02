@@ -25,7 +25,7 @@ export default function Checkout() {
   const pricingKey = searchParams.get("pricingKey");
   const pricingType = searchParams.get("pricingType") || "oneTimePrice";
 
-  // ---- Form state ----
+
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -70,7 +70,7 @@ export default function Checkout() {
     fetchAll();
   }, [planId]);
 
-  // ---- Autofill user & restore saved data ----
+
   useEffect(() => {
     console.log("User from context:", user);
 
@@ -96,7 +96,6 @@ export default function Checkout() {
     console.log("Form updated:", updated);
   };
 
-  // ---- Validation ----
   const validateForm = () => {
     if (!formData.name || !formData.phone || !formData.scheduledDate || !formData.location) {
       setFormError("All fields are required before proceeding.");
@@ -115,7 +114,7 @@ export default function Checkout() {
     return true;
   };
 
-  // ---- Handle Payment ----
+  
   const handlePay = async () => {
     if (!isAuthenticated) {
       navigate(
@@ -146,7 +145,7 @@ export default function Checkout() {
         return;
       }
 
-      // Log order payload
+    
       const orderPayload = {
         name: formData.name,
         phoneNo: formData.phone,
