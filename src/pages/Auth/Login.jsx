@@ -10,7 +10,7 @@ export default function Login() {
   const location = useLocation();
   const { login } = useUser();
 
-  const from = location.state?.from || "/services";
+  const from = location.state?.from || "/";
   const autoAddService = location.state?.addService;
 
   const [mode, setMode] = useState("phone");
@@ -73,7 +73,6 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="w-full max-w-5xl flex items-center justify-center shadow-lg bg-white rounded-3xl overflow-hidden min-h-[500px]">
-        {/* Image section - hidden on mobile, rounded left side only */}
         <div className="hidden md:block md:w-1/2 bg-gray-100">
           <img
             src={loginVisual}
@@ -83,12 +82,12 @@ export default function Login() {
             draggable={false}
           />
         </div>
-        {/* Login card */}
+        
         <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-10">
           <h2 className="text-3xl md:text-4xl font-bold mb-2 text-center">Welcome back</h2>
           <p className="mb-6 text-gray-500 text-center">Sign in to your account</p>
           <div className="w-full max-w-xs mx-auto">
-            {/* Polished Toggle Tabs */}
+            
             <div className="flex mb-6 bg-gray-100 rounded-full p-1 shadow-inner">
               <button
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-full transition-all font-semibold text-base

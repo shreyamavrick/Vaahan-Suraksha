@@ -193,7 +193,6 @@ export default function Profile() {
     }
   };
 
-  // ---------- SIMPLE CLEAN UI BELOW ----------
   if (!initialLoaded) {
     return (
       <div className="w-full flex justify-center items-center h-64">
@@ -215,7 +214,6 @@ return (
   <div className="min-h-screen bg-gradient-to-tr from-indigo-50 to-blue-100 flex items-center justify-center px-2">
     <div className="w-full max-w-md bg-white shadow-xl rounded-2xl overflow-hidden my-12">
       <div className="flex flex-col items-center px-8 pt-8">
-        {/* Avatar with margin to avoid cutting */}
         <div className="bg-indigo-500 text-white text-3xl w-20 h-20 flex items-center justify-center rounded-full border-4 border-white shadow mb-4">
           {user.name ? user.name[0].toUpperCase() : "U"}
         </div>
@@ -278,7 +276,6 @@ return (
               name="password"
               value={form.password}
               onChange={onChange}
-              // placeholder="Leave blank to keep existing password"
               className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-200"
             />
           </div>

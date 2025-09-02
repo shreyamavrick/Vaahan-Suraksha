@@ -12,7 +12,6 @@ const Cars = () => {
 
   const token = localStorage.getItem("token");
 
-  // Fetch brands
   const fetchBrands = async () => {
     try {
       const res = await fetch(
@@ -25,7 +24,7 @@ const Cars = () => {
     }
   };
 
-  // Fetch models by brand
+ 
   const fetchModels = async (brandId) => {
     if (!brandId) return [];
     try {
@@ -41,7 +40,6 @@ const Cars = () => {
     }
   };
 
-  // Fetch user car
   const fetchUserCar = async () => {
     try {
       const res = await fetch(
@@ -55,11 +53,10 @@ const Cars = () => {
         setTransmission(car.transmission || "");
         setFuel(car.fuel || "");
 
-        // Fetch models of the brand
         const modelsList = await fetchModels(car.brand?._id);
         setModels(modelsList);
 
-        // Get correct model name
+    
         const carModelId = car.carModelId || car.brand?.car_models?.[0] || "";
         setSelectedModel(carModelId);
         const matchedModel = modelsList.find((m) => m._id === carModelId);
@@ -78,13 +75,11 @@ const Cars = () => {
     }
   };
 
-  // On component mount
   useEffect(() => {
     fetchBrands();
     fetchUserCar();
   }, []);
 
-  // Handle brand change
   const handleBrandChange = async (brandId) => {
     setSelectedBrand(brandId);
     setSelectedModel("");
@@ -92,7 +87,6 @@ const Cars = () => {
     setModels(modelsList);
   };
 
-  // Add car
   const handleAddCar = async () => {
     if (!selectedBrand || !selectedModel || !transmission || !fuel) {
       alert("Please fill all fields!");
@@ -125,7 +119,6 @@ const Cars = () => {
     }
   };
 
-  // Update car
   const handleUpdateCar = async () => {
     if (!selectedBrand || !selectedModel || !transmission || !fuel) {
       alert("Please fill all fields!");
@@ -153,14 +146,14 @@ const Cars = () => {
       if (data.success) {
         alert("Car updated successfully!");
         setIsEditing(false);
-        fetchUserCar(); // ✅ REFRESH full car details to get brand & model name
+        fetchUserCar(); 
       } else alert(data.message || "Failed to update car");
     } catch (err) {
       console.error(err);
     }
   };
 
-  // Delete car
+
   const handleDeleteCar = async () => {
     if (!userCar?._id) return;
     try {

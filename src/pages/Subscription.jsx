@@ -58,7 +58,7 @@
             const firstKey = getFirstPricingKey(p.pricing);
             if (firstKey) {
               initialPricingSel[p._id] = firstKey;
-              initialTypeSel[p._id] = "oneTimePrice"; // default
+              initialTypeSel[p._id] = "oneTimePrice"; 
             }
           });
           setPricingSelection(initialPricingSel);
@@ -92,16 +92,19 @@
     const handlePricingTypeChange = (planId, type) => setPricingTypeSelection((prev) => ({ ...prev, [planId]: type }));
 
     const handleSubscribe = (plan) => {
-      const pricingKey = pricingSelection[plan._id] || getFirstPricingKey(plan.pricing);
-      const type = pricingTypeSelection[plan._id] || "oneTimePrice";
+  const pricingKey = pricingSelection[plan._id] || getFirstPricingKey(plan.pricing);
+  const type = pricingTypeSelection[plan._id] || "oneTimePrice";
 
-      if (!isAuthenticated) {
-        navigate(`/login?redirect=/checkout?planId=${plan._id}&pricingKey=${pricingKey}&pricingType=${type}`);
-        return;
-      }
+  if (!isAuthenticated) {
+    const checkoutRoute = type === "oneTimePrice" ? "/checkout-onetime" : "/checkout";
+    navigate(`/login?redirect=${checkoutRoute}?planId=${plan._id}&pricingKey=${pricingKey}&pricingType=${type}`);
+    return;
+  }
 
-      navigate(`/checkout?planId=${plan._id}&pricingKey=${pricingKey}&pricingType=${type}`);
-    };
+  const checkoutRoute = type === "oneTimePrice" ? "/checkout-onetime" : "/checkout";
+  navigate(`${checkoutRoute}?planId=${plan._id}&pricingKey=${pricingKey}&pricingType=${type}`);
+};
+
 
     if (loading) return <div className="min-h-[60vh] grid place-items-center animate-pulse">Loading plans…</div>;
     if (err) return <div className="min-h-[60vh] grid place-items-center text-red-600">{err}</div>;
@@ -117,7 +120,7 @@
               <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-blue-800">
                 You’re looking for: <span className="font-semibold">{servicesMap[targetServiceId]?.name || targetServiceParam}</span>
                 {recommendedPlanId ? <span className="ml-2">— Recommended plan highlighted below.</span> : <span className="ml-2">— No plan explicitly lists this service.</span>}
-              </div>
+              </div> 
             )}
           </header>
 

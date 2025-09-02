@@ -16,7 +16,8 @@ import Orders from "./components/Dashboard/Orders";
 import Cars from "./components/Dashboard/Cars";
 import Addresses from "./components/Dashboard/Addresses";
 import Coins from "./components/Dashboard/Coins";
-import Subscription from "./pages/Subscription"
+import Subscription from "./pages/Subscription";
+import Onetimecheckout from "./pages/Onetime-checkout";
 
 
 
@@ -35,6 +36,7 @@ function App() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/allservices" element={<AllServices />} />
         <Route path="/subscription" element={<Subscription />} />
+        <Route path="/checkout-onetime" element={<Onetimecheckout />} />
 
 
         
