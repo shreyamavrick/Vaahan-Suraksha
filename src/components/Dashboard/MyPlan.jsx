@@ -48,7 +48,7 @@ export default function MyPlan() {
     <section className="min-h-[70vh] flex justify-center items-center bg-gray-50 px-4 py-12">
       <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-8 text-center">
         <h1 className="text-3xl font-bold mb-6 text-gray-900 flex justify-center items-center gap-3">
-          <FaCrown className="text-yellow-500" />
+          
           My Plan
         </h1>
 
