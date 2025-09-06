@@ -4,17 +4,17 @@ import "./index.css";
 import App from "./App.jsx";
 
 import { UserProvider } from "./context/UserContext";
-import { CartProvider } from "./context/cartContext";
 import { VehicleProvider } from "./context/vehicleContext.jsx";
+import { CartProvider } from "./context/cartContext";
 
-createRoot(document.getElementById("root")).render( 
+createRoot(document.getElementById("root")).render(
   <StrictMode>
     <UserProvider>
-      <CartProvider>
-        <VehicleProvider>
-        <App />
-        </VehicleProvider>
-      </CartProvider>
+      <VehicleProvider>
+        <CartProvider>
+          <App />
+        </CartProvider>
+      </VehicleProvider>
     </UserProvider>
   </StrictMode>
 );

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useVehicle } from "../../context/vehicleContext"; 
 
 const Cars = () => {
   const [brands, setBrands] = useState([]);
@@ -10,6 +11,7 @@ const Cars = () => {
   const [userCar, setUserCar] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
+  const { setVehicle } = useVehicle(); 
   const token = localStorage.getItem("token");
 
   const fetchBrands = async () => {
@@ -24,7 +26,6 @@ const Cars = () => {
     }
   };
 
- 
   const fetchModels = async (brandId) => {
     if (!brandId) return [];
     try {
@@ -56,12 +57,27 @@ const Cars = () => {
         const modelsList = await fetchModels(car.brand?._id);
         setModels(modelsList);
 
-    
         const carModelId = car.carModelId || car.brand?.car_models?.[0] || "";
         setSelectedModel(carModelId);
         const matchedModel = modelsList.find((m) => m._id === carModelId);
 
-        setUserCar({ ...car, modelName: matchedModel?.name || "N/A" });
+        const formattedCar = {
+          _id: car._id,
+          brand: car.brand,
+          model: matchedModel || { _id: carModelId, name: "N/A" },
+          transmission: car.transmission,
+          fuel: car.fuel,
+        };
+
+        setUserCar(formattedCar);
+
+        
+        setVehicle({
+          brand: formattedCar.brand?.name || "",
+          model: formattedCar.model?.name || "",
+          transmission: formattedCar.transmission,
+          fuel: formattedCar.fuel,
+        });
       } else {
         setUserCar(null);
         setSelectedBrand("");
@@ -69,6 +85,9 @@ const Cars = () => {
         setTransmission("");
         setFuel("");
         setModels([]);
+
+     
+        setVehicle({ brand: "", model: "", fuel: "" });
       }
     } catch (err) {
       console.error(err);
@@ -112,7 +131,7 @@ const Cars = () => {
       const data = await res.json();
       if (data.success) {
         alert("Car added successfully!");
-        fetchUserCar();
+        fetchUserCar(); 
       } else alert(data.message || "Failed to add car");
     } catch (err) {
       console.error(err);
@@ -153,7 +172,6 @@ const Cars = () => {
     }
   };
 
-
   const handleDeleteCar = async () => {
     if (!userCar?._id) return;
     try {
@@ -163,8 +181,7 @@ const Cars = () => {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+            Authorization: `Bearer ${token}`},
           body: JSON.stringify({ carId: userCar._id }),
         }
       );
@@ -178,6 +195,9 @@ const Cars = () => {
         setFuel("");
         setModels([]);
         setIsEditing(false);
+
+      
+        setVehicle({ brand: "", model: "", fuel: "" });
       } else alert(data.message || "Failed to delete car");
     } catch (err) {
       console.error(err);
@@ -197,7 +217,6 @@ const Cars = () => {
             transmission={transmission}
             fuel={fuel}
             handleBrandChange={handleBrandChange}
-            setSelectedBrand={setSelectedBrand}
             setSelectedModel={setSelectedModel}
             setTransmission={setTransmission}
             setFuel={setFuel}
@@ -209,31 +228,13 @@ const Cars = () => {
         <>
           <h2 className="text-xl font-bold mb-4">My Car</h2>
           <div className="border p-4 rounded shadow-sm">
-            <p>
-              <strong>Brand:</strong> {userCar.brand?.name}
-            </p>
-            <p>
-              <strong>Model:</strong> {userCar.modelName}
-            </p>
-            <p>
-              <strong>Transmission:</strong> {userCar.transmission}
-            </p>
-            <p>
-              <strong>Fuel:</strong> {userCar.fuel}
-            </p>
+            <p><strong>Brand:</strong> {userCar.brand?.name}</p>
+            <p><strong>Model:</strong> {userCar.model?.name}</p>
+            <p><strong>Transmission:</strong> {userCar.transmission}</p>
+            <p><strong>Fuel:</strong> {userCar.fuel}</p>
             <div className="mt-4 flex gap-2">
-              <button
-                className="bg-green-500 text-white px-4 py-2 rounded"
-                onClick={() => setIsEditing(true)}
-              >
-                Update
-              </button>
-              <button
-                className="bg-red-500 text-white px-4 py-2 rounded"
-                onClick={handleDeleteCar}
-              >
-                Delete
-              </button>
+              <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={() => setIsEditing(true)}>Update</button>
+              <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={handleDeleteCar}>Delete</button>
             </div>
           </div>
         </>
@@ -248,7 +249,6 @@ const Cars = () => {
             transmission={transmission}
             fuel={fuel}
             handleBrandChange={handleBrandChange}
-            setSelectedBrand={setSelectedBrand}
             setSelectedModel={setSelectedModel}
             setTransmission={setTransmission}
             setFuel={setFuel}
@@ -270,7 +270,6 @@ const CarForm = ({
   transmission,
   fuel,
   handleBrandChange,
-  setSelectedBrand,
   setSelectedModel,
   setTransmission,
   setFuel,
@@ -286,9 +285,7 @@ const CarForm = ({
     >
       <option value="">Select Brand</option>
       {brands.map((b) => (
-        <option key={b._id} value={b._id}>
-          {b.name}
-        </option>
+        <option key={b._id} value={b._id}>{b.name}</option>
       ))}
     </select>
 
@@ -299,9 +296,7 @@ const CarForm = ({
     >
       <option value="">Select Model</option>
       {models.map((m) => (
-        <option key={m._id} value={m._id}>
-          {m.name}
-        </option>
+        <option key={m._id} value={m._id}>{m.name}</option>
       ))}
     </select>
 
@@ -327,17 +322,11 @@ const CarForm = ({
     </select>
 
     <div className="col-span-2 flex gap-2 mt-2">
-      <button
-        onClick={onSubmit}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
+      <button onClick={onSubmit} className="bg-blue-500 text-white px-4 py-2 rounded">
         {submitText}
       </button>
       {onCancel && (
-        <button
-          onClick={onCancel}
-          className="bg-gray-500 text-white px-4 py-2 rounded"
-        >
+        <button onClick={onCancel} className="bg-gray-500 text-white px-4 py-2 rounded">
           Cancel
         </button>
       )}

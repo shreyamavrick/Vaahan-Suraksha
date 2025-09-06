@@ -14,7 +14,7 @@ const getFirstPricingKey = (pricingObj) => {
   return keys.length ? keys[0] : null;
 };
 
-export default function Subscription() {
+export default function Subscription() { 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { isAuthenticated } = useUser();

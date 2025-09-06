@@ -1,13 +1,30 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useVehicle } from "../context/vehicleContext";
+import { useUser } from "../context/UserContext";
 
 const AllServices = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { vehicle } = useVehicle();
+  const { vehicle, setVehicle } = useVehicle();
+  const { user, isAuthenticated } = useUser();
   const navigate = useNavigate();
 
+  
+  useEffect(() => {
+    if (isAuthenticated && user?._id) {
+      const savedCar = localStorage.getItem(`car_${user._id}`);
+      if (savedCar) {
+        try {
+          setVehicle(JSON.parse(savedCar));
+        } catch {
+          localStorage.removeItem(`car_${user._id}`);
+        }
+      }
+    }
+  }, [isAuthenticated, user, setVehicle]);
+
+ 
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -29,14 +46,18 @@ const AllServices = () => {
   }, []);
 
   const handleBookService = async (service) => {
-    if (!vehicle.brand || !vehicle.model) {
-      alert("Please select your Brand & Model first!");
-      navigate("/");
+    if (!isAuthenticated) {
+      alert("Please log in first to book a service.");
+      navigate("/login");
+      return;
+    }
+    if (!vehicle?.brand || !vehicle?.model) {
+      alert("Please confirm your car details before booking.");
+      navigate("/dashboard/cars"); 
       return;
     }
 
     try {
-      // ✅ Fetch subscriptions to check if service is covered
       const res = await fetch(
         "https://vaahan-suraksha-backend.vercel.app/api/v1/service/subscription/"
       );
@@ -45,19 +66,27 @@ const AllServices = () => {
       if (data.success) {
         const subscriptions = data.data;
 
-        // For now assume the user has the "first subscription" (later bind with userContext)
-        const userSubscription = subscriptions[0]; 
+        // ⚡ For now assume the user has the first subscription
+        const userSubscription = subscriptions[0];
 
         const isIncluded = userSubscription.services.includes(service._id);
 
         if (isIncluded) {
           // Book service directly
-          alert(`✅ ${service.name} booked successfully for your ${vehicle.brand} ${vehicle.model}`);
+          alert(
+            `✅ ${service.name} booked successfully for your ${vehicle.brand} ${vehicle.model}`
+          );
           // 👉 here call your booking API when ready
         } else {
           // Suggest upgrade
-          if (window.confirm(`❌ ${service.name} is not included in your plan.\nWould you like to view subscription?`)) {
-            navigate("/subscription", { state: { recommendedService: service } });
+          if (
+            window.confirm(
+              `❌ ${service.name} is not included in your plan.\nWould you like to view subscription?`
+            )
+          ) {
+            navigate("/subscription", {
+              state: { recommendedService: service },
+            });
           }
         }
       }
@@ -71,7 +100,26 @@ const AllServices = () => {
     return <p className="text-center py-20">Loading services...</p>;
   }
 
-  if (!vehicle.brand || !vehicle.model) {
+  // 🚨 If logged in but no car saved → force redirect to /cars
+  if (isAuthenticated && (!vehicle?.brand || !vehicle?.model)) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <h2 className="text-xl font-semibold mb-2">Confirm Your Car</h2>
+        <p className="text-gray-600 mb-4">
+          Please add your car details before booking a service.
+        </p>
+        <button
+          onClick={() => navigate("/dashboard/cars")}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Add Car
+        </button>
+      </div>
+    );
+  }
+
+  // 🚨 If not logged in and no vehicle chosen → ask to go home
+  if (!isAuthenticated && (!vehicle?.brand || !vehicle?.model)) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <h2 className="text-xl font-semibold mb-2">Select Vehicle</h2>
@@ -97,12 +145,22 @@ const AllServices = () => {
         </h2>
 
         {/* Vehicle info */}
-        <p className="text-center text-gray-600 mb-14">
-          Showing services for:{" "}
-          <span className="font-semibold">
-            {vehicle.brand} {vehicle.model}
-          </span>
-        </p>
+        {vehicle?.brand && vehicle?.model && (
+          <p className="text-center text-gray-600 mb-14">
+            Showing services for:{" "}
+            <span className="font-semibold">
+              {vehicle.brand} {vehicle.model}
+            </span>{" "}
+            {isAuthenticated && (
+              <button
+                onClick={() => navigate("/dashboard/cars")}
+                className="ml-2 text-blue-600 underline hover:text-blue-800 text-sm"
+              >
+                Edit
+              </button>
+            )}
+          </p>
+        )}
 
         {/* Service Cards */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">

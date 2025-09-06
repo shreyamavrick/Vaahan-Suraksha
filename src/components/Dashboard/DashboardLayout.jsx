@@ -8,7 +8,8 @@ import {
   FaDollarSign,
   FaSignOutAlt,
   FaBars,
-  FaChevronLeft
+  FaChevronLeft,
+  FaBoxOpen
 } from "react-icons/fa";
 import { useUser } from "../../context/UserContext";
 
@@ -18,6 +19,7 @@ const menu = [
   { label: "My Cars", to: "/dashboard/cars", icon: <FaCar /> },
   { label: "Addresses", to: "/dashboard/addresses", icon: <FaMapMarkerAlt /> },
   { label: "Coins", to: "/dashboard/coins", icon: <FaDollarSign /> },
+  { label: "My Plans", to: "/dashboard/myplan", icon: <FaBoxOpen />},
 ];
 
 const getInitials = (name, email) => {

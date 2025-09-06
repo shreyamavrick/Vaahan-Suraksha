@@ -1,3 +1,4 @@
+// src/context/UserContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
 
 const UserContext = createContext();
@@ -5,6 +6,7 @@ const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [auth, setAuth] = useState(null);
 
+  // Load auth from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem("auth");
     if (saved) {
@@ -16,28 +18,40 @@ export const UserProvider = ({ children }) => {
     }
   }, []);
 
+  // ✅ Login or update user
   const login = (authPayload) => {
-    setAuth(authPayload);
-    localStorage.setItem("auth", JSON.stringify(authPayload));
+    setAuth((prev) => {
+      const updatedUser = {
+        ...prev?.user,
+        ...authPayload.user,
+        currentPlan: authPayload.user?.currentPlan || prev?.user?.currentPlan || null,
+        isSubscribed: (authPayload.user?.isSubscribed ?? prev?.user?.isSubscribed) || false,
+      };
 
-    // ✅ Add these lines
-    if (authPayload.accessToken) {
-      localStorage.setItem("token", authPayload.accessToken);
-    }
-    if (authPayload.user) {
-      localStorage.setItem("user", JSON.stringify(authPayload.user));
-    }
+      const updatedPayload = {
+        ...prev,
+        ...authPayload,
+        user: updatedUser,
+      };
+
+      // Save to localStorage
+      localStorage.setItem("auth", JSON.stringify(updatedPayload));
+      if (updatedPayload.accessToken) localStorage.setItem("token", updatedPayload.accessToken);
+      if (updatedPayload.user) localStorage.setItem("user", JSON.stringify(updatedPayload.user));
+
+      return updatedPayload;
+    });
   };
 
+  // ✅ Logout clears everything
   const logout = () => {
     setAuth(null);
     localStorage.removeItem("auth");
-
-    // ✅ Remove token and user on logout
     localStorage.removeItem("token");
     localStorage.removeItem("user");
   };
 
+  // Shortcut for user object
   const user = auth?.user || null;
 
   return (
@@ -48,6 +62,7 @@ export const UserProvider = ({ children }) => {
         isAuthenticated: !!auth?.accessToken,
         login,
         logout,
+        setAuth, // optional: allows manual state update
       }}
     >
       {children}

@@ -18,6 +18,7 @@ import Addresses from "./components/Dashboard/Addresses";
 import Coins from "./components/Dashboard/Coins";
 import Subscription from "./pages/Subscription";
 import Onetimecheckout from "./pages/Onetime-checkout";
+import MyPlan from "./components/Dashboard/MyPlan";
 
 
 
@@ -37,8 +38,6 @@ function App() {
         <Route path="/allservices" element={<AllServices />} />
         <Route path="/subscription" element={<Subscription />} />
         <Route path="/checkout-onetime" element={<Onetimecheckout />} />
-
-
         
         <Route path="/dashboard" element={<DashboardLayout />} >
           <Route path="/dashboard/profile" element={<Profile />} />
@@ -46,7 +45,8 @@ function App() {
           <Route path="/dashboard/cars" element={<Cars />} />
           <Route path="/dashboard/addresses" element={<Addresses />} />
           <Route path="/dashboard/coins" element={<Coins />} />
-
+          <Route path="/dashboard/myplan" element={<MyPlan />} />
+          
           </Route>
       </Routes>
       <Footer />

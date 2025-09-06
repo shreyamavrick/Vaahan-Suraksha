@@ -13,7 +13,7 @@ const currency = (n) =>
 export default function Checkout() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useUser();
+  const { isAuthenticated, user } = useUser(); 
 
   const [plan, setPlan] = useState(null);
   const [servicesMap, setServicesMap] = useState({});

@@ -1,29 +1,38 @@
-// src/context/VehicleContext.jsx
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useUser } from "./UserContext";
 
 const VehicleContext = createContext();
 
 export const VehicleProvider = ({ children }) => {
-  const [vehicle, setVehicle] = useState({
-    brand: "",
-    model: "",
-    id: "",
-  });
+  const { user } = useUser(); 
+  const [vehicle, setVehicle] = useState({ brand: "", model: "", fuel: "" });
 
-  // Load from localStorage on first load
+  
   useEffect(() => {
-    const saved = localStorage.getItem("vehicle");
-    if (saved) {
-      setVehicle(JSON.parse(saved));
+    if (!user?._id) {
+      setVehicle({ brand: "", model: "", fuel: "" });
+      return;
     }
-  }, []);
 
-  // Save to localStorage whenever vehicle changes
-  useEffect(() => {
-    if (vehicle.brand && vehicle.model) {
-      localStorage.setItem("vehicle", JSON.stringify(vehicle));
+    const savedCar = localStorage.getItem(`car_${user._id}`);
+    if (savedCar) {
+      try {
+        setVehicle(JSON.parse(savedCar));
+      } catch {
+        localStorage.removeItem(`car_${user._id}`);
+        setVehicle({ brand: "", model: "", fuel: "" });
+      }
+    } else {
+      setVehicle({ brand: "", model: "", fuel: "" });
     }
-  }, [vehicle]);
+  }, [user]);
+
+  
+  useEffect(() => {
+    if (user?._id && vehicle?.brand && vehicle?.model) {
+      localStorage.setItem(`car_${user._id}`, JSON.stringify(vehicle));
+    }
+  }, [user, vehicle]);
 
   return (
     <VehicleContext.Provider value={{ vehicle, setVehicle }}>
@@ -32,5 +41,4 @@ export const VehicleProvider = ({ children }) => {
   );
 };
 
-// Hook to use vehicle context
 export const useVehicle = () => useContext(VehicleContext);

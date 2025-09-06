@@ -4,16 +4,18 @@ import { useUser } from "../context/UserContext";
 
 const PLANS_URL = "https://vaahan-suraksha-backend.vercel.app/api/v1/service/subscription/";
 const SERVICES_URL = "https://vaahan-suraksha-backend.vercel.app/api/v1/service/";
+const CREATE_SUBSCRIPTION_URL = "https://vaahan-suraksha-backend.vercel.app/api/v1/service/subscription/b2c/purchase";
+const VERIFY_SUBSCRIPTION_URL = "https://vaahan-suraksha-backend.vercel.app/api/v1/service/subscription/b2c/purchase/verify";
 
 const currency = (n) =>
   typeof n === "number"
     ? n.toLocaleString("en-IN", { style: "currency", currency: "INR" })
     : "—";
 
-export default function Checkout() {
+export default function MonthlyCheckout() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { isAuthenticated } = useUser();
+  const { isAuthenticated, user, login } = useUser();
 
   const [plan, setPlan] = useState(null);
   const [servicesMap, setServicesMap] = useState({});
@@ -23,7 +25,7 @@ export default function Checkout() {
 
   const planId = searchParams.get("planId");
   const pricingKey = searchParams.get("pricingKey");
-  const pricingType = searchParams.get("pricingType") || "oneTimePrice";
+  const pricingType = searchParams.get("pricingType") || "monthlyPrice";
 
   useEffect(() => {
     if (!planId) {
@@ -31,9 +33,12 @@ export default function Checkout() {
       setLoading(false);
       return;
     }
+
     const fetchAll = async () => {
       try {
         setLoading(true);
+
+        // Fetch all plans
         const plansRes = await fetch(PLANS_URL);
         const plansJson = await plansRes.json();
         if (!plansJson.success) throw new Error(plansJson.message || "Failed to load plans");
@@ -42,6 +47,8 @@ export default function Checkout() {
         if (!planData) throw new Error("Plan not found.");
 
         setPlan(planData);
+
+        // Fetch all services
         const servicesRes = await fetch(SERVICES_URL);
         const servicesJson = await servicesRes.json();
         if (!servicesJson.success) throw new Error(servicesJson.message || "Failed to load services");
@@ -51,6 +58,7 @@ export default function Checkout() {
           map[s._id] = s;
         });
         setServicesMap(map);
+
       } catch (e) {
         setErr(e.message || "Something went wrong.");
       } finally {
@@ -63,63 +71,59 @@ export default function Checkout() {
 
   const handlePay = async () => {
     if (!isAuthenticated) {
-      navigate(
-        `/login?redirect=/checkout?planId=${planId}&pricingKey=${pricingKey}&pricingType=${pricingType}`
-      );
+      navigate(`/login?redirect=/monthly-checkout?planId=${planId}&pricingKey=${pricingKey}&pricingType=${pricingType}`);
       return;
     }
+
     if (!plan) {
       alert("Plan data missing");
       return;
     }
+
     setProcessing(true);
 
     try {
       const token = localStorage.getItem("token");
       const serviceIds = plan.services?.map((s) => (typeof s === "string" ? s : s._id));
       const price = plan.pricing?.[pricingKey]?.[pricingType];
+      const limit = plan.limit || 30;
+
       if (!price) {
         alert("Pricing not found.");
         setProcessing(false);
         return;
       }
 
-      const orderRes = await fetch(
-        "https://vaahan-suraksha-backend.vercel.app/api/v1/order/oneTime/create",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-          body: JSON.stringify({
-            planId,
-            pricingType,
-            amount: price,
-            serviceIds,
-          }),
-        }
-      );
-      const orderJson = await orderRes.json();
-      if (!orderJson.success) {
-        alert(orderJson.message || "Order creation failed");
+      // Step 1: Create subscription purchase
+      const createRes = await fetch(CREATE_SUBSCRIPTION_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify({ planId, price, limit, serviceIds }),
+      });
+      const createJson = await createRes.json();
+      if (!createJson.success) {
+        alert(createJson.message || "Subscription creation failed");
         setProcessing(false);
         return;
       }
-      const { razorpayOrderId, amount, currency, key, newOrderId } = orderJson.data;
 
+      const { razorpayOrderId, amount, currency, key } = createJson.data;
+
+      // Step 2: Open Razorpay
       const options = {
         key,
-        amount, 
+        amount,
         currency,
         order_id: razorpayOrderId,
         name: plan.name,
-        description: "Vaahan Suraksha Plan Purchase",
+        description: "Vaahan Suraksha Monthly Subscription",
         handler: async function (razorpayResponse) {
-        
-          const verifyRes = await fetch(
-            "https://vaahan-suraksha-backend.vercel.app/api/v1/order/oneTime/verify",
-            {
+          try {
+            // Step 3: Verify subscription
+            const verifyRes = await fetch(VERIFY_SUBSCRIPTION_URL, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -129,20 +133,35 @@ export default function Checkout() {
                 razorpay_payment_id: razorpayResponse.razorpay_payment_id,
                 razorpay_order_id: razorpayResponse.razorpay_order_id,
                 razorpay_signature: razorpayResponse.razorpay_signature,
-                orderId: newOrderId,
+                userId: user?._id,
               }),
+            });
+
+            const verifyJson = await verifyRes.json();
+            console.log("Verify subscription response:", verifyJson);
+
+            if (verifyJson.success) {
+              // ✅ Directly update user context
+              login({
+                accessToken: token,
+                user: verifyJson.data.user,
+              });
+
+              // ✅ Redirect to MyPlan
+              navigate("/dashboard/myplan");
+            } else {
+              alert("Subscription verification failed");
             }
-          );
-          const verifyJson = await verifyRes.json();
-          console.log("API Response:", verifyJson);
-         
-          if (verifyJson.success) {
-            navigate("/dashboard/orders"); 
-          } else {
-            alert("Payment verification failed");
+          } catch (err) {
+            console.error("Verification error:", err);
+            alert("Something went wrong while verifying payment.");
           }
         },
-        prefill: {},
+        prefill: {
+          name: user?.fullName,
+          contact: user?.phone,
+          email: user?.email,
+        },
         theme: { color: "#2563eb" },
         modal: { ondismiss: () => setProcessing(false) },
       };
@@ -157,59 +176,53 @@ export default function Checkout() {
   };
 
   if (loading)
-    return (
-      <div className="min-h-[60vh] grid place-items-center animate-pulse">
-        {"Loading checkout…"}
-      </div>
-    );
+    return <div className="min-h-[60vh] grid place-items-center animate-pulse">Loading checkout…</div>;
   if (err)
-    return (
-      <div className="min-h-[60vh] grid place-items-center text-red-600">{err}</div>
-    );
+    return <div className="min-h-[60vh] grid place-items-center text-red-600">{err}</div>;
 
-  const selectedTier = plan.pricing?.[pricingKey];
+  const selectedTier = plan?.pricing?.[pricingKey];
   const price = selectedTier?.[pricingType];
 
   return (
-  <section className="min-h-screen py-14 bg-gradient-to-b from-indigo-50 to-white flex justify-center px-4">
-    <div className="w-full max-w-3xl bg-white rounded-xl shadow-lg p-8 sm:p-12">
-      <h1 className="text-3xl font-extrabold mb-6 text-gray-900 text-center sm:text-left">Checkout</h1>
+    <section className="min-h-screen py-14 bg-gradient-to-b from-indigo-50 to-white flex justify-center px-4">
+      <div className="w-full max-w-3xl bg-white rounded-xl shadow-lg p-8 sm:p-12">
+        <h1 className="text-3xl font-extrabold mb-6 text-gray-900 text-center sm:text-left">
+          Monthly Subscription Checkout
+        </h1>
 
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold text-gray-800 mb-1">Selected Plan</h2>
-        <p className="text-gray-700 text-lg font-medium">{plan.name}</p>
-        <p className="text-sm text-gray-500 mt-1">
-          Tier: <span className="capitalize">{pricingKey}</span> &middot;{" "}
-          <span>{pricingType === "oneTimePrice" ? "One-time" : "Monthly"}</span>
-        </p>
-        <p className="mt-3 text-2xl font-bold text-indigo-600">{currency(price)}</p>
-      </div>
-
-      {plan.services?.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-800 mb-3">Included Services</h2>
-          <ul className="list-disc list-inside space-y-1 text-gray-700 leading-relaxed text-base max-h-60 overflow-auto">
-            {plan.services.map((s) => {
-              const name = typeof s === "string" ? servicesMap[s]?.name : s.name;
-              return (
-                <li key={typeof s === "string" ? s : s._id} className="hover:text-indigo-600 transition-colors">
-                  {name || "Unknown Service"}
-                </li>
-              );
-            })}
-          </ul>
+          <h2 className="text-xl font-semibold text-gray-800 mb-1">Selected Plan</h2>
+          <p className="text-gray-700 text-lg font-medium">{plan.name}</p>
+          <p className="text-sm text-gray-500 mt-1">
+            Tier: <span className="capitalize">{pricingKey}</span> · Monthly
+          </p>
+          <p className="mt-3 text-2xl font-bold text-indigo-600">{currency(price)}</p>
         </div>
-      )}
 
-      <button
-        onClick={handlePay}
-        disabled={processing}
-        className="w-full bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-400 focus:outline-none text-white font-semibold py-3 rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed"
-      >
-        {processing ? "Processing…" : "Proceed to Pay"}
-      </button>
-    </div>
-  </section>
-);
+        {plan.services?.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-3">Included Services</h2>
+            <ul className="list-disc list-inside space-y-1 text-gray-700 leading-relaxed text-base max-h-60 overflow-auto">
+              {plan.services.map((s) => {
+                const name = typeof s === "string" ? servicesMap[s]?.name : s.name;
+                return (
+                  <li key={typeof s === "string" ? s : s._id} className="hover:text-indigo-600 transition-colors">
+                    {name || "Unknown Service"}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
 
+        <button
+          onClick={handlePay}
+          disabled={processing}
+          className="w-full bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-400 focus:outline-none text-white font-semibold py-3 rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          {processing ? "Processing…" : "Proceed to Pay"}
+        </button>
+      </div>
+    </section>
+  );
 }
