@@ -2,15 +2,17 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useVehicle } from "../context/vehicleContext";
 import { useUser } from "../context/UserContext";
-
+import { useCart } from "../context/cartContext";
+import { ShoppingCart } from "lucide-react"; 
 const AllServices = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const { vehicle, setVehicle } = useVehicle();
   const { user, isAuthenticated } = useUser();
+  const { addToCart, isInCart, cart } = useCart(); 
   const navigate = useNavigate();
 
-  
+  // Load saved car for logged-in user
   useEffect(() => {
     if (isAuthenticated && user?._id) {
       const savedCar = localStorage.getItem(`car_${user._id}`);
@@ -24,7 +26,7 @@ const AllServices = () => {
     }
   }, [isAuthenticated, user, setVehicle]);
 
- 
+  // Fetch all services
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -41,66 +43,61 @@ const AllServices = () => {
         setLoading(false);
       }
     };
-
     fetchServices();
   }, []);
 
-  const handleBookService = async (service) => {
+  const handleBookService = (service) => {
     if (!isAuthenticated) {
       alert("Please log in first to book a service.");
       navigate("/login");
       return;
     }
+
     if (!vehicle?.brand || !vehicle?.model) {
       alert("Please confirm your car details before booking.");
-      navigate("/dashboard/cars"); 
+      navigate("/dashboard/cars");
       return;
     }
 
-    try {
-      const res = await fetch(
-        "https://vaahan-suraksha-backend.vercel.app/api/v1/service/subscription/"
-      );
-      const data = await res.json();
+    const userPlan = user?.currentPlan;
 
-      if (data.success) {
-        const subscriptions = data.data;
-
-        // ⚡ For now assume the user has the first subscription
-        const userSubscription = subscriptions[0];
-
-        const isIncluded = userSubscription.services.includes(service._id);
-
-        if (isIncluded) {
-          // Book service directly
-          alert(
-            `✅ ${service.name} booked successfully for your ${vehicle.brand} ${vehicle.model}`
-          );
-          // 👉 here call your booking API when ready
-        } else {
-          // Suggest upgrade
-          if (
-            window.confirm(
-              `❌ ${service.name} is not included in your plan.\nWould you like to view subscription?`
-            )
-          ) {
-            navigate("/subscription", {
-              state: { recommendedService: service },
-            });
-          }
-        }
+    if (!userPlan) {
+      if (
+        window.confirm(
+          ` You don’t have a subscription. ${service.name} requires a plan.\nWould you like to view subscriptions?`
+        )
+      ) {
+        navigate("/subscription", { state: { recommendedService: service } });
       }
-    } catch (err) {
-      console.error("Error checking subscription:", err);
-      alert("Something went wrong. Please try again.");
+      return;
+    }
+
+    const isIncluded = userPlan.services?.some((s) =>
+      typeof s === "string" ? s === service._id : s._id === service._id
+    );
+
+    if (isIncluded) {
+      if (isInCart(service._id)) {
+        alert(`🛒 ${service.name} is already in your cart.`);
+      } else {
+        addToCart(service);
+        alert(
+          `${service.name} added to cart for your ${vehicle.brand} ${vehicle.model}`
+        );
+      }
+    } else {
+      if (
+        window.confirm(
+          ` ${service.name} is not included in your current plan (${userPlan.name}).\nWould you like to view upgradation options?`
+        )
+      ) {
+        navigate("/subscription", { state: { recommendedService: service } });
+      }
     }
   };
 
-  if (loading) {
-    return <p className="text-center py-20">Loading services...</p>;
-  }
+  if (loading) return <p className="text-center py-20">Loading services...</p>;
 
-  // 🚨 If logged in but no car saved → force redirect to /cars
   if (isAuthenticated && (!vehicle?.brand || !vehicle?.model)) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
@@ -118,7 +115,6 @@ const AllServices = () => {
     );
   }
 
-  // 🚨 If not logged in and no vehicle chosen → ask to go home
   if (!isAuthenticated && (!vehicle?.brand || !vehicle?.model)) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
@@ -138,13 +134,25 @@ const AllServices = () => {
 
   return (
     <section className="py-20 bg-gradient-to-b from-gray-50 to-gray-100">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-        {/* Title */}
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 relative">
+        {/* 🛒 Cart Icon with Badge */}
+<button
+  onClick={() => navigate("/cart")}
+  className="fixed top-35 right-14 z-50 p-2 rounded-full bg-white shadow hover:bg-gray-100 transition"
+>
+  <ShoppingCart className="w-6 h-6 text-blue-600" />
+  {cart.length > 0 && (
+    <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+      {cart.length}
+    </span>
+  )}
+</button>
+
+
         <h2 className="text-4xl font-bold text-center mb-6 text-gray-800">
           Our <span className="text-blue-600">Premium Services</span>
         </h2>
 
-        {/* Vehicle info */}
         {vehicle?.brand && vehicle?.model && (
           <p className="text-center text-gray-600 mb-14">
             Showing services for:{" "}
@@ -162,14 +170,12 @@ const AllServices = () => {
           </p>
         )}
 
-        {/* Service Cards */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {services.map((service) => (
             <div
               key={service._id}
               className="bg-white rounded-2xl shadow-md hover:shadow-2xl transition duration-300 transform hover:-translate-y-2 overflow-hidden border border-gray-200"
             >
-              {/* Image */}
               <div className="relative group">
                 <img
                   src={
@@ -182,16 +188,20 @@ const AllServices = () => {
                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
 
-              {/* Content */}
               <div className="p-6 text-center">
                 <h3 className="text-lg font-semibold text-gray-800">
                   {service.name}
                 </h3>
                 <button
                   onClick={() => handleBookService(service)}
-                  className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className={`mt-4 px-4 py-2 rounded-lg text-white ${
+                    isInCart(service._id)
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  }`}
+                  disabled={isInCart(service._id)}
                 >
-                  Book Service
+                  {isInCart(service._id) ? "In Cart" : "Book Service"}
                 </button>
               </div>
             </div>

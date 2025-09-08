@@ -1,73 +1,78 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+// src/context/cartContext.jsx
+import { createContext, useContext, useState, useEffect } from "react";
+import { useUser } from "./UserContext";
 
 const CartContext = createContext();
-export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
-  const [cartLoaded, setCartLoaded] = useState(false);
+  const { user } = useUser();
 
- 
+  // storage key depends on user ID (or guest)
+  const storageKey = user ? `autocare_cart_${user.uid}` : "autocare_cart_guest";
+
+  // Load cart from localStorage for this user
+  const [cart, setCart] = useState(() => {
+    try {
+      const savedCart = localStorage.getItem(storageKey);
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Save cart whenever it changes
   useEffect(() => {
-    const stored = localStorage.getItem("autocare_cart");
-    setCartItems(stored ? JSON.parse(stored) : []);
-    setCartLoaded(true);
-  }, []);
+    localStorage.setItem(storageKey, JSON.stringify(cart));
+  }, [cart, storageKey]);
 
- 
+  // Reset cart when user changes (login/logout)
   useEffect(() => {
-    if (!cartLoaded) return; 
-    localStorage.setItem("autocare_cart", JSON.stringify(cartItems));
-  }, [cartItems, cartLoaded]);
+    try {
+      const savedCart = localStorage.getItem(storageKey);
+      setCart(savedCart ? JSON.parse(savedCart) : []);
+    } catch {
+      setCart([]);
+    }
+  }, [storageKey]);
 
- 
+  // ✅ Auto-clear cart on logout
+  useEffect(() => {
+    if (!user) {
+      setCart([]); // clear cart when user logs out
+      localStorage.removeItem("autocare_cart_guest");
+    }
+  }, [user]);
+
+  // ------------------ CART OPERATIONS ------------------ //
   const addToCart = (service) => {
-    setCartItems((prev) => {
-      const idx = prev.findIndex((c) => c.service.id === service.id);
-      if (idx > -1) {
-        const updated = [...prev];
-        updated[idx].qty += 1;
-        return updated;
+    setCart((prev) => {
+      if (!prev.some((item) => item._id === service._id)) {
+        return [...prev, service];
       }
-      return [...prev, { service, qty: 1 }];
+      return prev;
     });
   };
 
   const removeFromCart = (id) => {
-    setCartItems((prev) => prev.filter((c) => c.service.id !== id));
+    setCart((prev) => prev.filter((item) => item._id !== id));
   };
 
-  const changeQuantity = (id, delta) => {
-    setCartItems((prev) =>
-      prev
-        .map((c) =>
-          c.service.id === id
-            ? { ...c, qty: Math.max(1, c.qty + delta) }
-            : c
-        )
-        .filter((c) => c.qty > 0)
-    );
-  };
+  const clearCart = () => setCart([]);
 
-  const isInCart = (id) => cartItems.some((c) => c.service.id === id);
+  const isInCart = (id) => cart.some((item) => item._id === id);
 
-  const subtotal = cartItems.reduce(
-    (sum, c) => sum + c.service.newPrice * c.qty,
+  const subtotal = cart.reduce(
+    (sum, item) => sum + (item.newPrice || 0),
     0
   );
 
   return (
     <CartContext.Provider
-      value={{
-        cartItems,
-        addToCart,
-        removeFromCart,
-        changeQuantity,
-        isInCart,
-        subtotal,
-      }}
+      value={{ cart, addToCart, removeFromCart, clearCart, isInCart, subtotal }}
     >
       {children}
     </CartContext.Provider>
   );
 };
+
+export const useCart = () => useContext(CartContext);

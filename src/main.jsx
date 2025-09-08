@@ -5,16 +5,16 @@ import App from "./App.jsx";
 
 import { UserProvider } from "./context/UserContext";
 import { VehicleProvider } from "./context/vehicleContext.jsx";
-import { CartProvider } from "./context/cartContext";
+import { CartProvider } from "./context/cartContext.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <UserProvider>
-      <VehicleProvider>
-        <CartProvider>
-          <App />
-        </CartProvider>
-      </VehicleProvider>
-    </UserProvider>
+  <CartProvider>
+    <VehicleProvider>
+      <App />
+    </VehicleProvider>
+  </CartProvider>
+</UserProvider>
   </StrictMode>
 );

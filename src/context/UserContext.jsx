@@ -24,8 +24,13 @@ export const UserProvider = ({ children }) => {
       const updatedUser = {
         ...prev?.user,
         ...authPayload.user,
-        currentPlan: authPayload.user?.currentPlan || prev?.user?.currentPlan || null,
-        isSubscribed: (authPayload.user?.isSubscribed ?? prev?.user?.isSubscribed) || false,
+        currentPlan:
+          authPayload.user?.currentPlan ||
+          prev?.user?.currentPlan ||
+          null,
+        isSubscribed:
+          (authPayload.user?.isSubscribed ?? prev?.user?.isSubscribed) ||
+          false,
       };
 
       const updatedPayload = {
@@ -36,14 +41,16 @@ export const UserProvider = ({ children }) => {
 
       // Save to localStorage
       localStorage.setItem("auth", JSON.stringify(updatedPayload));
-      if (updatedPayload.accessToken) localStorage.setItem("token", updatedPayload.accessToken);
-      if (updatedPayload.user) localStorage.setItem("user", JSON.stringify(updatedPayload.user));
+      if (updatedPayload.accessToken)
+        localStorage.setItem("token", updatedPayload.accessToken);
+      if (updatedPayload.user)
+        localStorage.setItem("user", JSON.stringify(updatedPayload.user));
 
       return updatedPayload;
     });
   };
 
-  // ✅ Logout clears everything
+  // ✅ Logout clears only auth (cart is cleared outside in components)
   const logout = () => {
     setAuth(null);
     localStorage.removeItem("auth");
@@ -51,7 +58,6 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem("user");
   };
 
-  // Shortcut for user object
   const user = auth?.user || null;
 
   return (
@@ -62,7 +68,7 @@ export const UserProvider = ({ children }) => {
         isAuthenticated: !!auth?.accessToken,
         login,
         logout,
-        setAuth, // optional: allows manual state update
+        setAuth, // optional
       }}
     >
       {children}
