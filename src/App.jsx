@@ -15,7 +15,7 @@ import Profile from "./components/Dashboard/Profile";
 import Orders from "./components/Dashboard/Orders";
 import Cars from "./components/Dashboard/Cars";
 import Addresses from "./components/Dashboard/Addresses";
-import Coins from "./components/Dashboard/Coins";
+// import Coins from "./components/Dashboard/Coins";
 import Subscription from "./pages/Subscription";
 import Onetimecheckout from "./pages/Onetime-checkout";
 import MyPlan from "./components/Dashboard/MyPlan";
@@ -44,7 +44,7 @@ function App() {
           <Route path="/dashboard/orders" element={<Orders />} />
           <Route path="/dashboard/cars" element={<Cars />} />
           <Route path="/dashboard/addresses" element={<Addresses />} />
-          <Route path="/dashboard/coins" element={<Coins />} />
+          {/* <Route path="/dashboard/coins" element={<Coins />} /> */}
           <Route path="/dashboard/myplan" element={<MyPlan />} />
           
           </Route>

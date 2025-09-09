@@ -30,8 +30,11 @@ const ServicesSection = () => {
           / Custom Services /
         </p>
         <h2 className="text-4xl sm:text-5xl font-bold leading-tight pb-4">
-          Explore Our <span className="text-[#1DA1F2]">services</span> of car
-        </h2>
+  Your Vehicle Deserves<br />
+  <span className="text-[#1DA1F2]">Custom </span> Components
+</h2>
+
+
       </div>
 
       {/* Products Grid */}
@@ -57,9 +60,7 @@ const ServicesSection = () => {
               </div>
             )}
             <p className="mt-4 font-bold text-lg">{product.name}</p>
-            {product?.brand?.name && (
-              <p className="text-sm text-gray-500">{product.brand.name}</p>
-            )}
+            
           </div>
         ))}
       </div>

@@ -19,7 +19,7 @@ import {
   FaCar,
   FaMapMarkerAlt,
   FaSignOutAlt,
-  FaStar,
+  FaBoxOpen,
 } from "react-icons/fa";
 
 const navWithIcons = [
@@ -154,11 +154,11 @@ export default function Navbar() {
                       </li>
                       <li>
                         <Link
-                          to="/dashboard/coins"
+                          to="/dashboard/myplan"
                           className="flex items-center gap-2 px-5 py-2 hover:bg-gray-100"
                           onClick={() => setDropdownOpen(false)}
                         >
-                          <FaStar className="text-yellow-400" /> Coins
+                          <FaBoxOpen /> My Plan
                         </Link>
                       </li>
                       <li>

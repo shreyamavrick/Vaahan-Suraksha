@@ -10,12 +10,14 @@ const Cars = () => {
   const [fuel, setFuel] = useState("");
   const [userCar, setUserCar] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const { setVehicle } = useVehicle(); 
   const token = localStorage.getItem("token");
 
   const fetchBrands = async () => {
     try {
+      setLoading(true);
       const res = await fetch(
         "https://vaahan-suraksha-backend.vercel.app/api/v1/car/brand/"
       );
@@ -23,6 +25,8 @@ const Cars = () => {
       if (data.success) setBrands(data.data);
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,6 +47,7 @@ const Cars = () => {
 
   const fetchUserCar = async () => {
     try {
+      setLoading(true);
       const res = await fetch(
         "https://vaahan-suraksha-backend.vercel.app/api/v1/car/",
         { headers: { Authorization: `Bearer ${token}` } }
@@ -71,7 +76,6 @@ const Cars = () => {
 
         setUserCar(formattedCar);
 
-        
         setVehicle({
           brand: formattedCar.brand?.name || "",
           model: formattedCar.model?.name || "",
@@ -85,12 +89,12 @@ const Cars = () => {
         setTransmission("");
         setFuel("");
         setModels([]);
-
-     
         setVehicle({ brand: "", model: "", fuel: "" });
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -112,6 +116,7 @@ const Cars = () => {
       return;
     }
     try {
+      setLoading(true);
       const res = await fetch(
         "https://vaahan-suraksha-backend.vercel.app/api/v1/car/create",
         {
@@ -135,6 +140,8 @@ const Cars = () => {
       } else alert(data.message || "Failed to add car");
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -144,6 +151,7 @@ const Cars = () => {
       return;
     }
     try {
+      setLoading(true);
       const res = await fetch(
         "https://vaahan-suraksha-backend.vercel.app/api/v1/car/update",
         {
@@ -169,12 +177,15 @@ const Cars = () => {
       } else alert(data.message || "Failed to update car");
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteCar = async () => {
     if (!userCar?._id) return;
     try {
+      setLoading(true);
       const res = await fetch(
         "https://vaahan-suraksha-backend.vercel.app/api/v1/car/delete",
         {
@@ -195,20 +206,23 @@ const Cars = () => {
         setFuel("");
         setModels([]);
         setIsEditing(false);
-
-      
         setVehicle({ brand: "", model: "", fuel: "" });
       } else alert(data.message || "Failed to delete car");
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="p-6">
-      {!userCar && !isEditing ? (
-        <>
-          <h2 className="text-xl font-bold mb-4">Add Car</h2>
+    <div className="p-6 w-full">
+      {loading ? (
+        <Loader />
+      ) : !userCar && !isEditing ? (
+        <div className="bg-white shadow-md rounded-lg p-6 w-full">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">Add Your Car 🚗</h2>
+          <p className="text-gray-500 mb-6">No car added yet. Please add your car details below.</p>
           <CarForm
             brands={brands}
             models={models}
@@ -223,24 +237,37 @@ const Cars = () => {
             onSubmit={handleAddCar}
             submitText="Add Car"
           />
-        </>
+        </div>
       ) : userCar && !isEditing ? (
-        <>
-          <h2 className="text-xl font-bold mb-4">My Car</h2>
-          <div className="border p-4 rounded shadow-sm">
-            <p><strong>Brand:</strong> {userCar.brand?.name}</p>
-            <p><strong>Model:</strong> {userCar.model?.name}</p>
-            <p><strong>Transmission:</strong> {userCar.transmission}</p>
-            <p><strong>Fuel:</strong> {userCar.fuel}</p>
-            <div className="mt-4 flex gap-2">
-              <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={() => setIsEditing(true)}>Update</button>
-              <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={handleDeleteCar}>Delete</button>
-            </div>
+        <div className="bg-white shadow-md rounded-lg p-6 w-full">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">My Car 🚘</h2>
+          <div className="bg-gray-50 border border-gray-200 p-6 rounded-lg shadow-sm">
+            <ul className="space-y-2 text-gray-700">
+              <li><strong>Brand:</strong> {userCar.brand?.name}</li>
+              <li><strong>Model:</strong> {userCar.model?.name}</li>
+              <li><strong>Transmission:</strong> {userCar.transmission}</li>
+              <li><strong>Fuel:</strong> {userCar.fuel}</li>
+            </ul>
+            <div className="mt-6 flex gap-3">
+  <button
+    className="flex items-center gap-2 border border-gray-400 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
+    onClick={() => setIsEditing(true)}
+  >
+    ✏️ Update
+  </button>
+  <button
+    className="flex items-center gap-2 border border-gray-400 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
+    onClick={handleDeleteCar}
+  >
+    🗑️ Delete
+  </button>
+</div>
+
           </div>
-        </>
+        </div>
       ) : (
-        <>
-          <h2 className="text-xl font-bold mb-4">Update Car</h2>
+        <div className="bg-white shadow-md rounded-lg p-6 w-full">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">Update Car ✏️</h2>
           <CarForm
             brands={brands}
             models={models}
@@ -256,11 +283,18 @@ const Cars = () => {
             submitText="Update Car"
             onCancel={() => setIsEditing(false)}
           />
-        </>
+        </div>
       )}
     </div>
   );
 };
+
+
+const Loader = () => (
+  <div className="flex justify-center items-center h-64">
+    <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
 
 const CarForm = ({
   brands,
@@ -277,11 +311,11 @@ const CarForm = ({
   submitText,
   onCancel,
 }) => (
-  <div className="grid grid-cols-2 gap-4 mb-4">
+  <div className="grid grid-cols-2 gap-4">
     <select
       value={selectedBrand}
       onChange={(e) => handleBrandChange(e.target.value)}
-      className="border p-2 rounded"
+      className="border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-400 focus:outline-none"
     >
       <option value="">Select Brand</option>
       {brands.map((b) => (
@@ -292,7 +326,7 @@ const CarForm = ({
     <select
       value={selectedModel}
       onChange={(e) => setSelectedModel(e.target.value)}
-      className="border p-2 rounded"
+      className="border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-400 focus:outline-none"
     >
       <option value="">Select Model</option>
       {models.map((m) => (
@@ -303,7 +337,7 @@ const CarForm = ({
     <select
       value={transmission}
       onChange={(e) => setTransmission(e.target.value)}
-      className="border p-2 rounded"
+      className="border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-400 focus:outline-none"
     >
       <option value="">Select Transmission</option>
       <option value="Automatic">Automatic</option>
@@ -313,7 +347,7 @@ const CarForm = ({
     <select
       value={fuel}
       onChange={(e) => setFuel(e.target.value)}
-      className="border p-2 rounded"
+      className="border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-400 focus:outline-none"
     >
       <option value="">Select Fuel</option>
       <option value="Petrol">Petrol</option>
@@ -321,12 +355,18 @@ const CarForm = ({
       <option value="CNG">CNG</option>
     </select>
 
-    <div className="col-span-2 flex gap-2 mt-2">
-      <button onClick={onSubmit} className="bg-blue-500 text-white px-4 py-2 rounded">
+    <div className="col-span-2 flex gap-3 mt-4">
+      <button
+        onClick={onSubmit}
+        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg shadow transition"
+      >
         {submitText}
       </button>
       {onCancel && (
-        <button onClick={onCancel} className="bg-gray-500 text-white px-4 py-2 rounded">
+        <button
+          onClick={onCancel}
+          className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg shadow transition"
+        >
           Cancel
         </button>
       )}

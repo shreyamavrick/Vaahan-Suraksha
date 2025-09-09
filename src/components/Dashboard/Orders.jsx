@@ -27,7 +27,7 @@ const Orders = () => {
     fetchOrders();
   }, []);
 
-  // filter orders by type
+
   const oneTimeOrders = orders.filter((o) => o.type === "oneTime");
   const monthlyOrders = orders.filter((o) => o.type === "monthly");
 

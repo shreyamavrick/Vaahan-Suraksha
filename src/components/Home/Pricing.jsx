@@ -75,7 +75,7 @@ const Pricing = () => {
 
             {/* Button */}
             <a
-              href="#"
+              href="/subscription"
               className="mt-auto block text-center w-full py-3 rounded-lg font-medium border border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white transition"
             >
               Purchase Now

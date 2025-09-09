@@ -5,7 +5,6 @@ import {
   FaClipboardList,
   FaCar,
   FaMapMarkerAlt,
-  FaDollarSign,
   FaSignOutAlt,
   FaBars,
   FaChevronLeft,
@@ -18,7 +17,6 @@ const menu = [
   { label: "Orders", to: "/dashboard/orders", icon: <FaClipboardList /> },
   { label: "My Cars", to: "/dashboard/cars", icon: <FaCar /> },
   { label: "Addresses", to: "/dashboard/addresses", icon: <FaMapMarkerAlt /> },
-  { label: "Coins", to: "/dashboard/coins", icon: <FaDollarSign /> },
   { label: "My Plans", to: "/dashboard/myplan", icon: <FaBoxOpen />},
 ];
 
@@ -86,7 +84,7 @@ export default function DashboardLayout() {
                         : "text-gray-700 hover:bg-gray-100"
                     }`
                   }
-                  onClick={() => setSidebarOpen(false)} // close sidebar on mobile
+                  onClick={() => setSidebarOpen(false)} 
                 >
                   {item.icon}
                   {item.label}
