@@ -12,7 +12,7 @@ const WhyChooseUs = () => {
             What makes us <span className="text-[#49AEFE]">different?</span>
           </h2>
           <p className="mt-6 text-gray-600 leading-relaxed">
-            We carefully screen all of our cleaners, so you can rest assured that your home would receive the absolute highest quality of service providing. Ultricies tristique nulla aliquet enim tortor at auctor urna nunc.
+            Vaahan Suraksha offers hassle-free, transparent, and timely vehicle care with expert technicians, flexible maintenance plans, doorstep service, and 24/7 support, ensuring your vehicles stay safe, efficient, and always road-ready, giving you complete peace of mind.
           </p>
           <a
             href="/about"
@@ -32,22 +32,22 @@ const WhyChooseUs = () => {
           <FeatureItem
             icon={<Users size={24} />}
             title="Experienced Mechanics"
-            desc="We had technical knowledge and physical abilities, important to practice and learn Mechanics"
+            desc="Skilled professionals ensuring reliable and efficient vehicle care every time."
           />
           <FeatureItem
             icon={<Clock size={24} />}
             title="24/7 Quality Service"
-            desc="Our skilled technicians arrive equipped with the necessary tools and expertise for 24/7"
+            desc="Round-the-clock vehicle support for emergencies and routine maintenance."
           />
           <FeatureItem
             icon={<ShieldCheck size={24} />}
             title="Money Back Guarantee"
-            desc="Diagnose the vehicle thoroughly to narrow down the problem with money back Guarantee"
+            desc="Complete satisfaction or your money returned, no questions asked."
           />
           <FeatureItem
             icon={<Handshake size={24} />}
             title="Quality Equipment"
-            desc="Choosing the right equipment for your auto can spell the difference between other service"
+            desc="Advanced tools and technology for precise, high-quality vehicle servicing."
           />
         </div>
       </div>

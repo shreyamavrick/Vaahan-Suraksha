@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useVehicle } from "../../context/vehicleContext";
 import { useUser } from "../../context/UserContext";
 import hero_img_1 from "../../assets/hero_img_1.jpg";
 import hero_img_2 from "../../assets/hero_img_2.jpg";
+import hero_img_3 from "../../assets/hero_img_3.jpg";
 
 const slides = [
   {
@@ -16,17 +17,28 @@ const slides = [
   },
   {
     image: hero_img_2,
-    tagline: "YOUR CAR, YOUR CHOICE!",
+    tagline: "Keeo Your Vehicle Running Smoothly",
     title: "Advanced Vehicle Care",
     highlight: "Quality Service",
     subtitle: "Diagnostics, Repairs and Upgrades, All at one place",
   },
+  {
+    image: hero_img_3,
+    tagline: "YOUR CAR, YOUR CHOICE!",
+    title: "Custom Services",
+    highlight: "At Your Doorstep",
+    subtitle: "Book a service & get an expert at your location",
+  },
 ];
+// console.log("Slides:", slides);
+
+
+const DOT_BG = "bg-[#49AEFE]/90 hover:bg-[#49AEFE]/60";
 
 const HeroSection = () => {
   const navigate = useNavigate();
   const { user } = useUser();
-  const { vehicle, setVehicle } = useVehicle();
+  const { setVehicle } = useVehicle();
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [step, setStep] = useState(1);
@@ -41,8 +53,7 @@ const HeroSection = () => {
   const [errors, setErrors] = useState({});
   const [hasAddedCar, setHasAddedCar] = useState(false);
 
-  const fuelTypes = ["Petrol", "Diesel", "CNG", "Electric"];
-
+  const fuelTypes = useMemo(() => ["Petrol", "Diesel", "CNG", "Electric"], []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -51,7 +62,6 @@ const HeroSection = () => {
     return () => clearInterval(interval);
   }, []);
 
- 
   useEffect(() => {
     if (user?._id) {
       const flag = localStorage.getItem(`hasAddedCar_${user._id}`);
@@ -70,9 +80,10 @@ const HeroSection = () => {
 
   useEffect(() => {
     if (!selectedBrandId) return;
-
     axios
-      .get(`https://vaahan-suraksha-backend.vercel.app/api/v1/car/model/${selectedBrandId}`)
+      .get(
+        `https://vaahan-suraksha-backend.vercel.app/api/v1/car/model/${selectedBrandId}`
+      )
       .then((res) => {
         setModels(res.data.data || []);
         setStep(3);
@@ -93,10 +104,15 @@ const HeroSection = () => {
     if (!fuel) newErrors.fuel = "Please select a fuel type";
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
-      setVehicle({ brand: manufacturer, model, fuel, location, mobile, id: selectedBrandId });
-
-
-      navigate("/allservices",  {
+      setVehicle({
+        brand: manufacturer,
+        model,
+        fuel,
+        location,
+        mobile,
+        id: selectedBrandId,
+      });
+      navigate("/allservices", {
         state: { location, mobile, manufacturer, model, fuel },
       });
     }
@@ -113,197 +129,359 @@ const HeroSection = () => {
   };
 
   return (
-    <div className="w-full h-screen relative overflow-hidden">
-      {slides.map((slide, index) => (
-        <div
-          key={index}
-          className={`absolute inset-0 transition-opacity duration-1000 ${
-            index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0"
-          }`}
-        >
-          <div
-            className="w-full h-screen bg-cover bg-center"
-            style={{ backgroundImage: `url(${slide.image})` }}
-          >
-            <div className="absolute inset-0 bg-black/35 flex flex-col md:flex-row items-center justify-center px-4 md:px-12 py-6 overflow-y-auto">
-              <div className="text-white text-center md:text-left w-full md:w-1/2 mb-8 md:mb-0">
-                <p className="text-sm font-medium uppercase tracking-wider mb-2">{slide.tagline}</p>
-                <h2 className="text-4xl md:text-6xl font-bold leading-tight">{slide.title}</h2>
-                <h3 className="text-4xl md:text-5xl font-bold mt-2 mb-3">{slide.highlight}</h3>
-                <p className="text-lg border-t pt-3 border-white/30">{slide.subtitle}</p>
-                <button
-                  onClick={() => navigate("/allservices")}
-                  className="mt-6 bg-[#49AEFE] hover:bg-blue-600 text-white px-8 py-3 rounded-full transition-colors duration-300"
-                >
-                  Our Services
-                </button>
-              </div>
-
-              <div className="bg-white rounded-xl shadow-xl p-6 w-full md:w-1/2 max-w-md">
-                {!hasAddedCar ? (
-                  <>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                      Get instant quotes for your car service
-                    </h3>
-
-                    {step > 1 && (
-                      <button
-                        onClick={() => setStep(step - 1)}
-                        className="text-sm text-blue-600 mb-2 hover:underline"
-                      >
-                        ← Back
-                      </button>
-                    )}
-
-                    {step === 1 && (
-                      <>
-                        <input
-                          type="text"
-                          placeholder="Enter City"
-                          value={location}
-                          onChange={(e) => setLocation(e.target.value)}
-                          className="w-full mb-1 p-2 border border-gray-300 rounded"
-                        />
-                        {errors.location && (
-                          <p className="text-red-500 text-sm mb-2">{errors.location}</p>
-                        )}
-
-                        <input
-                          type="tel"
-                          placeholder="Enter Mobile Number"
-                          value={mobile}
-                          onChange={(e) => setMobile(e.target.value)}
-                          className="w-full mb-1 p-2 border border-gray-300 rounded"
-                        />
-                        {errors.mobile && (
-                          <p className="text-red-500 text-sm mb-2">{errors.mobile}</p>
-                        )}
-
-                        <button
-                          onClick={handleNext}
-                          className="w-full bg-blue-600 text-white font-semibold py-2 rounded mt-2"
-                        >
-                          Continue
-                        </button>
-                      </>
-                    )}
-
-                    {step === 2 && (
-                      <>
-                        <p className="font-semibold mb-2">Select Manufacturer</p>
-                        <div className="grid grid-cols-3 gap-4 max-h-60 overflow-y-auto">
-                          {brands.map((brand) => (
-                            <div
-                              key={brand._id}
-                              onClick={() => handleBrandSelect(brand)}
-                              className="cursor-pointer text-center bg-gray-100 px-3 py-2 rounded hover:scale-105 transition"
-                            >
-                              <img
-                                src={getBrandImage(brand.name)}
-                                alt={brand.name}
-                                className="w-12 h-12 mx-auto mb-1"
-                                onError={(e) =>
-                                  (e.target.src = `/images/brands/${brand.name
-                                    .toLowerCase()
-                                    .replace(/\s+/g, "_")}.jpeg`)
-                                }
-                              />
-                              {brand.name}
-                            </div>
-                          ))}
-                        </div>
-                      </>
-                    )}
-
-                    {step === 3 && (
-                      <>
-                        <p className="font-semibold mb-2">Select Model</p>
-                        <div className="grid grid-cols-3 gap-4 max-h-60 overflow-y-auto">
-                          {models.map((m) => (
-                            <div
-                              key={m._id}
-                              onClick={() => {
-                                setModel(m.name);
-                                setStep(4);
-                              }}
-                              className="cursor-pointer text-center bg-gray-100 px-3 py-2 rounded hover:scale-105 transition"
-                            >
-                              <img
-                                src={getModelImage(m.name)}
-                                alt={m.name}
-                                className="w-12 h-12 mx-auto mb-1"
-                                onError={(e) =>
-                                  (e.target.src = `/images/models/${m.name
-                                    .toLowerCase()
-                                    .replace(/\s+/g, "_")}.jpeg`)
-                                }
-                              />
-                              {m.name}
-                            </div>
-                          ))}
-                        </div>
-                      </>
-                    )}
-
-                    {step === 4 && (
-                      <>
-                        <p className="font-semibold mb-2">Select Fuel Type</p>
-                        {errors.fuel && (
-                          <p className="text-red-500 text-sm mb-2">{errors.fuel}</p>
-                        )}
-                        <div className="grid grid-cols-2 gap-4">
-                          {fuelTypes.map((f) => (
-                            <div
-                              key={f}
-                              onClick={() => setFuel(f)}
-                              className={`cursor-pointer p-2 text-center border rounded text-sm font-medium ${
-                                fuel === f ? "border-blue-500 bg-blue-50" : "border-gray-200"
-                              }`}
-                            >
-                              {f}
-                            </div>
-                          ))}
-                        </div>
-                        <button
-                          onClick={handleSubmit}
-                          className="mt-4 w-full bg-blue-600 text-white font-semibold py-2 rounded"
-                        >
-                          Check Prices for Free
-                        </button>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <p className="text-center text-gray-600">
-                    Your car is already added. <br />
-                    Go to{" "}
-                    <span
-                      className="text-blue-600 underline cursor-pointer"
-                      onClick={() => navigate("/dashboard/cars")}
+    <div className="w-full container mx-auto md:mt-4">
+      {/* ===================== DESKTOP (md+) ===================== */}
+      <div className="hidden md:block relative w-full h-[550px] rounded-3xl overflow-hidden">
+        {slides.map((slide, index) => {
+          const isActive = index === currentSlide;
+          return (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-700 ${
+                isActive ? "opacity-100" : "opacity-0 pointer-events-none"
+              }`}
+            >
+              <div
+                className="w-full h-full bg-cover bg-center"
+                style={{ backgroundImage: `url(${slide.image})` }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent">
+                  <div className="h-full flex items-center justify-between px-8">
+                    {/* Left text */}
+                    <div
+                      className={`text-white max-w-3xl transition-all duration-700 ${
+                        isActive
+                          ? "opacity-100 translate-y-0"
+                          : "opacity-0 translate-y-2"
+                      }`}
                     >
-                      My Cars
-                    </span>{" "}
-                    to update it.
-                  </p>
-                )}
+                      <p className="text-sm font-medium uppercase tracking-wider mb-2">
+                        {slide.tagline}
+                      </p>
+                      <h2 className="text-[55px] lg:text-[80px] leading-none font-bold mt-5">
+                        {slide.title}
+                      </h2>
+                      <h3 className="text-[55px] lg:text-[80px] leading-none font-bold mt-3 mb-3">
+                        {slide.highlight}
+                      </h3>
+                      <p className="text-xl mb-8 border-t pt-3 border-white/20">
+                        {slide.subtitle}
+                      </p>
+                      <button
+                        onClick={() => navigate("/allservices")}
+                        className="bg-[#49AEFE] text-white px-8 py-3 rounded-full hover:bg-blue-600 transition-colors"
+                      >
+                        Our Services
+                      </button>
+                    </div>
+                    
+
+
+                    {/* Right form */}
+                    <div className="w-full max-w-[340px] ml-6">
+                      <FormBox
+                        step={step}
+                        setStep={setStep}
+                        location={location}
+                        setLocation={setLocation}
+                        mobile={mobile}
+                        setMobile={setMobile}
+                        brands={brands}
+                        models={models}
+                        manufacturer={manufacturer}
+                        setManufacturer={setManufacturer}
+                        model={model}
+                        setModel={setModel}
+                        fuel={fuel}
+                        setFuel={setFuel}
+                        fuelTypes={fuelTypes}
+                        handleNext={handleNext}
+                        handleSubmit={handleSubmit}
+                        errors={errors}
+                        getBrandImage={getBrandImage}
+                        getModelImage={getModelImage}
+                        handleBrandSelect={handleBrandSelect}
+                        hasAddedCar={hasAddedCar}
+                        navigate={navigate}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+          );
+        })}
+
+        {/* Right vertical dots */}
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-4 py-8 px-4 bg-[#f0f2f4] rounded-l-full">
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentSlide(i)}
+              className={`transition-all duration-300 h-2 w-2 rounded-full ${
+                i === currentSlide ? "bg-black" : DOT_BG
+              }`}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* ===================== MOBILE (<md) ===================== */}
+      <div className="md:hidden w-full">
+  {/* Background with full cover */}
+  <div
+    className="relative w-full min-h-[320px] bg-cover bg-center"
+    style={{ backgroundImage: `url(${slides[currentSlide].image})` }}
+  >
+    {/* Dark overlay */}
+    <div className="absolute inset-0 bg-black/40" />
+
+    {/* Centered text */}
+    <div className="relative z-10 flex flex-col items-start text-start text-white px-6 py-15 h-full">
+      <p className="text-xs uppercase tracking-wider mb-2">
+        {slides[currentSlide].tagline}
+      </p>
+      <h2 className="text-2xl sm:text-3xl font-bold leading-tight">
+        {slides[currentSlide].title}
+      </h2>
+      <h3 className="text-2xl sm:text-4xl font-bold leading-tight mt-2 mb-2">
+        {slides[currentSlide].highlight}
+      </h3>
+      <p className="text-sm sm:text-base max-w-xs mb-4">
+        {slides[currentSlide].subtitle}
+      </p>
+      <button
+        onClick={() => navigate("/allservices")}
+        className="bg-[#49AEFE] text-white px-6 py-2 rounded-full hover:bg-blue-600 transition-colors"
+      >
+        Our Services
+      </button>
+    </div>
+  </div>
+
+
+        {/* Form below (fully visible) */}
+        <div className="px-4 py-6">
+          <FormBox
+            step={step}
+            setStep={setStep}
+            location={location}
+            setLocation={setLocation}
+            mobile={mobile}
+            setMobile={setMobile}
+            brands={brands}
+            models={models}
+            manufacturer={manufacturer}
+            setManufacturer={setManufacturer}
+            model={model}
+            setModel={setModel}
+            fuel={fuel}
+            setFuel={setFuel}
+            fuelTypes={fuelTypes}
+            handleNext={handleNext}
+            handleSubmit={handleSubmit}
+            errors={errors}
+            getBrandImage={getBrandImage}
+            getModelImage={getModelImage}
+            handleBrandSelect={handleBrandSelect}
+            hasAddedCar={hasAddedCar}
+            navigate={navigate}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/** Reusable form box (same in mobile & desktop) */
+const FormBox = ({
+  step,
+  setStep,
+  location,
+  setLocation,
+  mobile,
+  setMobile,
+  brands,
+  models,
+  manufacturer,
+  setManufacturer,
+  model,
+  setModel,
+  fuel,
+  setFuel,
+  fuelTypes,
+  handleNext,
+  handleSubmit,
+  errors,
+  getBrandImage,
+  getModelImage,
+  handleBrandSelect,
+  hasAddedCar,
+  navigate,
+}) => {
+  return (
+    <div className="bg-white/95 backdrop-blur rounded-xl shadow-xl px-6 py-7 w-full">
+      {/* Heading only on step 1 */}
+      {step === 1 && (
+        <>
+          <h2 className="text-xl font-bold text-gray-900 text-center mb-1">
+            Experience The Best Car Services In Delhi
+          </h2>
+          <p className="text-sm text-gray-600 text-center mb-5">
+            Get instant quotes for your car service
+          </p>
+        </>
+      )}
+
+      {!hasAddedCar ? (
+        <>
+          {step > 1 && (
+            <button
+              onClick={() => setStep(step - 1)}
+              className="text-sm text-blue-600 mb-2 hover:underline"
+            >
+              ← Back
+            </button>
+          )}
+
+          {step === 1 && (
+            <>
+              <input
+                type="text"
+                placeholder="Enter City"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="w-full mb-2.5 p-3 border border-gray-300 rounded-md text-sm"
+              />
+              {errors.location && (
+                <p className="text-red-500 text-xs mb-2">{errors.location}</p>
+              )}
+
+              <input
+                type="tel"
+                placeholder="Enter Mobile Number"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
+                className="w-full mb-2.5 p-3 border border-gray-300 rounded-md text-sm"
+              />
+              {errors.mobile && (
+                <p className="text-red-500 text-xs mb-2">{errors.mobile}</p>
+              )}
+
+              <button
+                onClick={handleNext}
+                className="w-full bg-[#49AEFE] hover:bg-blue-600 text-white font-semibold py-3 rounded-md mt-1"
+              >
+                Continue
+              </button>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <p className="font-semibold mb-2">Select Manufacturer</p>
+              <div className="grid grid-cols-3 gap-3 max-h-56 overflow-y-auto pr-1">
+                {brands.map((brand) => (
+                  <div
+                    key={brand._id}
+                    onClick={() => handleBrandSelect(brand)}
+                    className="cursor-pointer text-center bg-gray-100 px-2.5 py-2 rounded hover:scale-105 transition"
+                  >
+                    <img
+                      src={getBrandImage(brand.name)}
+                      alt={brand.name}
+                      className="w-10 h-10 mx-auto mb-1 object-contain"
+                    />
+                    <span className="text-xs">{brand.name}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {step === 3 && (
+            <>
+              <p className="font-semibold mb-2">Select Model</p>
+              <div className="grid grid-cols-3 gap-3 max-h-56 overflow-y-auto pr-1">
+                {models.map((m) => (
+                  <div
+                    key={m._id}
+                    onClick={() => {
+                      setModel(m.name);
+                      setStep(4);
+                    }}
+                    className="cursor-pointer text-center bg-gray-100 px-2.5 py-2 rounded hover:scale-105 transition"
+                  >
+                    <img
+                      src={getModelImage(m.name)}
+                      alt={m.name}
+                      className="w-10 h-10 mx-auto mb-1 object-contain"
+                    />
+                    <span className="text-xs">{m.name}</span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {step === 4 && (
+            <>
+              <p className="font-semibold mb-2">Select Fuel Type</p>
+              {errors.fuel && (
+                <p className="text-red-500 text-xs mb-2">{errors.fuel}</p>
+              )}
+              <div className="grid grid-cols-2 gap-3">
+                {fuelTypes.map((f) => (
+                  <div
+                    key={f}
+                    onClick={() => setFuel(f)}
+                    className={`cursor-pointer p-2 text-center border rounded text-sm ${
+                      fuel === f
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200"
+                    }`}
+                  >
+                    {f}
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={handleSubmit}
+                className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded"
+              >
+                Check Prices for Free
+              </button>
+            </>
+          )}
+        </>
+      ) : (
+        <p className="text-center text-gray-600">
+          Your car is already added. <br />
+          Go to{" "}
+          <span
+            className="text-blue-600 underline cursor-pointer"
+            onClick={() => navigate("/dashboard/cars")}
+          >
+            My Cars
+          </span>{" "}
+          to update it.
+        </p>
+      )}
+
+      {/* Ratings only Step 1 */}
+      {step === 1 && (
+        <div className="flex items-center justify-between mt-4 border-t border-gray-200 text-gray-700 text-sm">
+          <div className="flex items-center gap-1">
+            <span className="text-green-600 font-semibold">★ 4.2/5</span>
+            <span className="ml-1 text-xs">Based on 40000+ Reviews</span>
+          </div>
+          <div className="text-right">
+            <p className="font-semibold text-sm">2 Lakh+</p>
+            <p className="text-xs">Happy Customers</p>
           </div>
         </div>
-      ))}
-
-      {/* Slide Indicators */}
-      <div className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 flex-col gap-4">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentSlide(index)}
-            className={`h-2 w-2 rounded-full transition ${
-              index === currentSlide ? "bg-black" : "bg-[#49AEFE]/80"
-            }`}
-          />
-        ))}
-      </div>
+      )}
     </div>
   );
 };

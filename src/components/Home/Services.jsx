@@ -50,15 +50,10 @@ const Services = () => {
                 alt={service.name}
                 className="rounded-2xl w-full h-44 sm:h-48 object-cover mb-4"
               />
-              <h3 className="text-lg sm:text-xl font-bold mb-1">
+              <h3 className="text-lg text-center sm:text-xl font-bold mb-1">
                 {service.name}
               </h3>
-              <a
-                href={`/services/${service._id}`}
-                className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-blue-500 text-white hover:bg-blue-600 transition"
-              >
-                <FaArrowRight />
-              </a>
+              
             </div>
           ))}
         </div>

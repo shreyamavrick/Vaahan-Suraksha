@@ -18,11 +18,12 @@ const Footer = () => {
           <div>
             <h4 className="text-lg text-white font-semibold mb-4">Useful Links</h4>
             <ul className="space-y-2">
-              <li>Home</li>
-              <li>About</li>
-              <li>Services</li>
-              <li>Contact</li>
-            </ul>
+  <li><a href="/" className="hover:text-blue-500">Home</a></li>
+  <li><a href="/about" className="hover:text-blue-500">About</a></li>
+  <li><a href="/allservices" className="hover:text-blue-500">Services</a></li>
+  <li><a href="/contact" className="hover:text-blue-500">Contact</a></li>
+</ul>
+
           </div>
 
           {/* Working Time */}

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { User, Mail, Phone, Lock } from "lucide-react";
 
 const API_BASE = "https://vaahan-suraksha-backend.vercel.app/api/v1";
-
 
 function readStoredSession() {
   const tryParse = (k) => {
@@ -16,6 +16,7 @@ function readStoredSession() {
   const auth = tryParse("auth") || tryParse("authPayload") || tryParse("authentication");
   const userOnly = tryParse("user") || tryParse("currentUser");
   const tokenOnly = localStorage.getItem("token") || localStorage.getItem("accessToken");
+
   if (auth) {
     const user = auth.user || auth.data?.user || auth.data || auth;
     const accessToken = auth.accessToken || auth.token || auth.data?.accessToken || auth.data?.token;
@@ -52,17 +53,10 @@ export default function Profile() {
       const { user: storedUser } = readStoredSession();
       if (storedUser) {
         const normalized = {
-          _id:
-            storedUser._id ||
-            storedUser.id ||
-            storedUser._uid ||
-            storedUser.userId ||
-            storedUser.user_id ||
-            storedUser._id,
-          name: storedUser.name || storedUser.fullName || storedUser.displayName || storedUser.username || "",
-          email: storedUser.email || storedUser.emailId || "",
-          phoneNo: storedUser.phoneNo || storedUser.phone || storedUser.mobile || "",
-          type: storedUser.type || storedUser.accountType || "",
+          _id: storedUser._id || storedUser.id,
+          name: storedUser.name || "",
+          email: storedUser.email || "",
+          phoneNo: storedUser.phoneNo || "",
           raw: storedUser,
         };
         setUser(normalized);
@@ -88,226 +82,140 @@ export default function Profile() {
     return client;
   };
 
-  const tryUpdateEndpoints = async (payload) => {
-    const client = makeClient();
-    const tries = [
-      { method: "patch", url: "/user/updateUser" },
-      { method: "put", url: "/user/update" },
-      { method: "patch", url: "/user/update" },
-      { method: "put", url: `/user/${user._id}` },
-      { method: "patch", url: `/user/${user._id}` },
-      { method: "put", url: `/user/updateUser` },
-      { method: "put", url: `/auth/update` },
-    ];
-
-    let lastErr = null;
-    for (const t of tries) {
-      try {
-        const res = await client.request({ method: t.method, url: t.url, data: payload });
-        if (res && (res.status === 200 || res.status === 201 || res.data?.success)) {
-          return res;
-        }
-      } catch (err) {
-        lastErr = err;
-      }
-    }
-    const err = lastErr || new Error("All update endpoints failed");
-    throw err;
-  };
-
   const onSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setMessage(null);
+    if (!form.name.trim()) return setError("Name is required");
+    if (!form.phoneNo.trim()) return setError("Phone number is required");
 
-    if (!user) {
-      setError("No logged-in user found. Please login first.");
-      return;
-    }
-    if (!form.name?.trim()) {
-      setError("Name is required");
-      return;
-    }
-    if (!form.phoneNo?.trim()) {
-      setError("Phone number is required");
-      return;
-    }
-    const payload = {
-      name: form.name.trim(),
-      phoneNo: form.phoneNo.trim(),
-    };
-    if (form.password && form.password.length > 0) payload.password = form.password;
     setLoading(true);
     try {
-      const res = await tryUpdateEndpoints(payload);
-      let updatedUser = null;
-      if (res.data) {
-        updatedUser = res.data.data?.user || res.data.user || res.data;
-      }
-      if (!updatedUser || typeof updatedUser !== "object") {
-        updatedUser = { ...user.raw, ...payload };
-      }
-      try {
-        const rawAuthStr = localStorage.getItem("auth");
-        if (rawAuthStr) {
-          const rawAuth = JSON.parse(rawAuthStr);
-          rawAuth.user = updatedUser;
-          localStorage.setItem("auth", JSON.stringify(rawAuth));
-        } else {
-          localStorage.setItem("user", JSON.stringify(updatedUser));
-        }
-        if (localStorage.getItem("currentUser")) {
-          localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-        }
-      } catch {}
-      const normalized = {
-        _id: updatedUser._id || updatedUser.id || user._id,
-        name: updatedUser.name || updatedUser.fullName || updatedUser.displayName || form.name,
-        email: updatedUser.email || form.email,
-        phoneNo: updatedUser.phoneNo || updatedUser.phone || form.phoneNo,
-        raw: updatedUser,
-      };
-      setUser(normalized);
-      setForm((s) => ({ ...s, password: "" }));
-      setMessage("Profile updated successfully");
+      await makeClient().patch("/user/updateUser", {
+        name: form.name.trim(),
+        phoneNo: form.phoneNo.trim(),
+        ...(form.password && { password: form.password }),
+      });
+      setMessage("Profile updated successfully!");
     } catch (err) {
-      try {
-        const rawAuthStr = localStorage.getItem("auth");
-        let updatedUser = { ...(user.raw || {}), name: payload.name, phoneNo: payload.phoneNo };
-        if (payload.password) updatedUser.password = payload.password;
-        if (rawAuthStr) {
-          const rawAuth = JSON.parse(rawAuthStr);
-          rawAuth.user = updatedUser;
-          localStorage.setItem("auth", JSON.stringify(rawAuth));
-        } else {
-          localStorage.setItem("user", JSON.stringify(updatedUser));
-        }
-        setUser((prev) => ({ ...prev, name: payload.name, phoneNo: payload.phoneNo, raw: updatedUser }));
-        setForm((s) => ({ ...s, password: "" }));
-        setMessage("Profile updated locally (API failed).");
-      } catch (stErr) {
-        setError((err && err.message) || "Update failed");
-      }
+      setError("Update failed, please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   if (!initialLoaded) {
-    return (
-      <div className="w-full flex justify-center items-center h-64">
-        <span className="text-gray-400 text-lg">Loading profile...</span>
-      </div>
-    );
+    return <div className="h-screen flex items-center justify-center text-gray-500">Loading...</div>;
   }
 
   if (!user) {
-    return (
-      <div className="max-w-md mx-auto mt-20 p-6 bg-white rounded-lg shadow-sm text-center">
-        <h2 className="text-2xl font-semibold mb-3">Profile</h2>
-        <p className="text-gray-500">Please log in to view or edit your profile.</p>
-      </div>
-    );
+    return <div className="h-screen flex items-center justify-center">Please login first.</div>;
   }
 
-return (
-  <div className="min-h-screen bg-gradient-to-tr from-indigo-50 to-blue-100 flex items-center justify-center px-2">
-    <div className="w-full max-w-md bg-white shadow-xl rounded-2xl overflow-hidden my-12">
-      <div className="flex flex-col items-center px-8 pt-8">
-        <div className="bg-indigo-500 text-white text-3xl w-20 h-20 flex items-center justify-center rounded-full border-4 border-white shadow mb-4">
-          {user.name ? user.name[0].toUpperCase() : "U"}
-        </div>
-        <div className="text-center mb-6">
-          <div className="text-2xl font-bold text-gray-900">{user.name}</div>
-          <div className="text-base text-gray-500">{user.email || "No email"}</div>
-          {user.phoneNo && (
-            <div className="text-sm text-gray-400">{user.phoneNo}</div>
-          )}
-        </div>
-      </div>
+  return (
+    <div className="w-full min-h-screen bg-gray-50 flex items-center justify-center px-4 md:px-6 py-10">
+      <form
+        onSubmit={onSubmit}
+        className="bg-white rounded-xl p-8 shadow-md w-full max-w-5xl space-y-6"
+      >
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">My Profile</h2>
 
-      <div className="px-8 pb-8">
         {message && (
-          <div className="mb-4 p-2 rounded bg-green-50 text-green-800 text-sm text-center border border-green-200">
+          <div className="p-3 rounded-md bg-green-100 text-green-700 border border-green-300 text-sm">
             ✅ {message}
           </div>
         )}
         {error && (
-          <div className="mb-4 p-2 rounded bg-red-50 text-red-700 text-sm text-center border border-red-200">
+          <div className="p-3 rounded-md bg-red-100 text-red-700 border border-red-300 text-sm">
             ⚠️ {error}
           </div>
         )}
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
-            <input
-              name="name"
-              value={form.name}
-              onChange={onChange}
-              className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-200"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
-            <input
-              name="email"
-              value={form.email}
-              disabled
-              className="w-full px-3 py-2 rounded-lg border border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
-            <input
-              name="phoneNo"
-              value={form.phoneNo}
-              onChange={onChange}
-              className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-200"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              New Password <span className="text-gray-400 font-normal">(optional)</span>
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={onChange}
-              className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-200"
-            />
-          </div>
-          <div className="flex gap-3 pt-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold transition disabled:opacity-50"
-            >
-              {loading ? "Updating..." : "Update Profile"}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setForm({
-                  name: user.name || "",
-                  email: user.email || "",
-                  phoneNo: user.phoneNo || "",
-                  password: "",
-                });
-                setMessage(null);
-                setError(null);
-              }}
-              className="flex-1 bg-gray-50 hover:bg-gray-100 border border-gray-200 px-4 py-2 rounded-lg font-semibold transition"
-            >
-              Reset
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-);
 
+        {/* Full Name */}
+        <div className="relative">
+          <User className="absolute left-3 top-3 text-gray-400" size={18} />
+          <input
+            name="name"
+            value={form.name}
+            onChange={onChange}
+            className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 
+                       focus:ring-2 focus:ring-blue-400 focus:border-blue-500 outline-none"
+            placeholder="Full Name"
+            required
+          />
+        </div>
+
+        {/* Email */}
+        <div className="relative">
+          <Mail className="absolute left-3 top-3 text-gray-400" size={18} />
+          <input
+            name="email"
+            value={form.email}
+            disabled
+            className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 bg-gray-100 
+                       text-gray-500 cursor-not-allowed"
+            placeholder="Email Address"
+          />
+        </div>
+
+        {/* Phone */}
+        <div className="relative">
+          <Phone className="absolute left-3 top-3 text-gray-400" size={18} />
+          <input
+            name="phoneNo"
+            value={form.phoneNo}
+            onChange={onChange}
+            className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 
+                       focus:ring-2 focus:ring-blue-400 focus:border-blue-500 outline-none"
+            placeholder="Phone Number"
+            required
+          />
+        </div>
+
+        {/* Password */}
+        <div className="relative">
+          <Lock className="absolute left-3 top-3 text-gray-400" size={18} />
+          <input
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={onChange}
+            placeholder="New Password (Optional)"
+            className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 
+                       focus:ring-2 focus:ring-blue-400 focus:border-blue-500 outline-none"
+          />
+        </div>
+
+        {/* Buttons */}
+<div className="flex gap-4 pt-4">
+  <button
+    type="submit"
+    disabled={loading}
+    className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-blue-500 
+               hover:from-blue-700 hover:to-blue-600 text-white 
+               rounded-full font-semibold shadow-md 
+               transition-transform duration-300 hover:scale-102 
+               disabled:opacity-50"
+  >
+    {loading ? "Updating..." : "Save Changes"}
+  </button>
+  
+  <button
+    type="button"
+    onClick={() => {
+      setForm({ name: user.name, email: user.email, phoneNo: user.phoneNo, password: "" });
+      setMessage(null);
+      setError(null);
+    }}
+    className="flex-1 py-3 border-2 border-gray-300 text-gray-700 
+               hover:bg-gray-100 rounded-full font-semibold 
+               transition-transform duration-300 hover:scale-102"
+  >
+    Reset
+  </button>
+</div>
+
+      </form>
+    </div>
+  );
 }

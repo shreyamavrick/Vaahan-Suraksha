@@ -1,7 +1,5 @@
-// src/pages/MyPlan.jsx
 import { useEffect, useState } from "react";
 import { useUser } from "../../context/UserContext";
-import { FaCrown } from "react-icons/fa";
 import axios from "axios";
 
 export default function MyPlan() {
@@ -10,13 +8,11 @@ export default function MyPlan() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [services, setServices] = useState([]);
 
-  // ✅ Sync currentPlan and subscription status whenever user updates
   useEffect(() => {
     setCurrentPlan(user?.currentPlan || null);
     setIsSubscribed(user?.isSubscribed || false);
   }, [user]);
 
-  // ✅ Fetch full service objects whenever currentPlan changes
   useEffect(() => {
     const fetchServices = async () => {
       if (currentPlan?.services?.length > 0) {
@@ -27,7 +23,6 @@ export default function MyPlan() {
 
           const allServices = res.data.data || [];
 
-          // Match plan service IDs with full service objects
           const matched = allServices.filter((s) =>
             currentPlan.services.includes(s._id)
           );
@@ -37,12 +32,12 @@ export default function MyPlan() {
           console.error("Error fetching services:", error);
         }
       } else {
-        setServices([]); // clear services if no current plan
+        setServices([]); 
       }
     };
 
     fetchServices();
-  }, [currentPlan]); // ✅ dependency is currentPlan
+  }, [currentPlan]); 
 
   return (
     <section className="min-h-[70vh] flex justify-center items-center bg-gray-50 px-4 py-12">
