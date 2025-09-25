@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
-  const [activeTab, setActiveTab] = useState("oneTime");
   const [expandedOrders, setExpandedOrders] = useState({});
 
   useEffect(() => {
@@ -15,7 +14,6 @@ const Orders = () => {
           "https://vaahan-suraksha-backend.vercel.app/api/v1/order/my",
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        console.log("Order API response:", res.data);
 
         setOrders(res.data.data || []);
       } catch (error) {
@@ -25,10 +23,15 @@ const Orders = () => {
     fetchOrders();
   }, []);
 
-
+  // Toggle expand/collapse
+  const toggleServices = (orderId) => {
+    setExpandedOrders((prev) => ({
+      ...prev,
+      [orderId]: !prev[orderId],
+    }));
+  };
 
   const oneTimeOrders = orders.filter((o) => o.type === "oneTime");
-  const monthlyOrders = orders.filter((o) => o.type === "monthly");
 
   const renderOrders = (orderList) => {
     if (!orderList.length) return <p className="text-gray-500">No orders found</p>;
@@ -81,6 +84,7 @@ const Orders = () => {
               )}
             </div>
 
+            {/* Accordion for Services */}
             {order.services?.length > 0 && (
               <div className="mt-5">
                 <button
@@ -138,27 +142,7 @@ const Orders = () => {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <h2 className="text-3xl font-bold mb-8 text-gray-800">My Orders</h2>
-
-      {/* Tabs */}
-      <div className="flex border-b mb-8">
-        {["oneTime", "monthly"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-3 text-center font-semibold transition-colors ${
-              activeTab === tab
-                ? "border-b-4 border-blue-600 text-blue-600"
-                : "text-gray-400 hover:text-gray-600"
-            }`}
-          >
-            {tab === "oneTime" ? "One-Time Orders" : "Monthly Orders"}
-          </button>
-        ))}
-      </div>
-
-      {activeTab === "oneTime"
-        ? renderOrders(oneTimeOrders)
-        : renderOrders(monthlyOrders)}
+      {renderOrders(oneTimeOrders)}
     </div>
   );
 };
