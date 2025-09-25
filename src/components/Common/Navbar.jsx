@@ -20,6 +20,7 @@ import {
   FaMapMarkerAlt,
   FaSignOutAlt,
   FaBoxOpen,
+  FaStar,
 } from "react-icons/fa";
 
 const navWithIcons = [
