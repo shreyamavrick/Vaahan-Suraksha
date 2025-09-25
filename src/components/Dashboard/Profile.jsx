@@ -131,7 +131,6 @@ export default function Profile() {
           </div>
         )}
 
-        {/* Full Name */}
         <div className="relative">
           <User className="absolute left-3 top-3 text-gray-400" size={18} />
           <input

@@ -221,7 +221,7 @@ const Cars = () => {
         <Loader />
       ) : !userCar && !isEditing ? (
         <div className="bg-white shadow-md rounded-lg p-6 w-full">
-          <h2 className="text-2xl font-bold mb-4 text-gray-800">Add Your Car </h2>
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">Add Your Car</h2>
           <p className="text-gray-500 mb-6">No car added yet. Please add your car details below.</p>
           <CarForm
             brands={brands}
@@ -253,16 +253,16 @@ const Cars = () => {
     className="flex items-center gap-2 border border-gray-400 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
     onClick={() => setIsEditing(true)}
   >
-    ✏️ Update
+    Update
   </button>
   <button
     className="flex items-center gap-2 border border-gray-400 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
     onClick={handleDeleteCar}
   >
-    🗑️ Delete
+    Delete
   </button>
 </div>
- 
+
           </div>
         </div>
       ) : (
@@ -289,37 +289,12 @@ const Cars = () => {
   );
 };
 
-
-// Loader with moving car
+// Loader Component
 const Loader = () => (
-  <div className="flex justify-center items-center h-64 relative overflow-hidden">
-    <div className="absolute w-20 h-20 animate-car">
-      <svg width="80" height="40" viewBox="0 0 80 40" xmlns="http://www.w3.org/2000/svg">
-        {/* Car body */}
-        <rect x="10" y="10" width="60" height="20" rx="5" fill="#2563eb" />
-        {/* Windows */}
-        <rect x="15" y="12" width="15" height="10" rx="2" fill="#93c5fd" />
-        <rect x="35" y="12" width="15" height="10" rx="2" fill="#93c5fd" />
-        {/* Wheels */}
-        <circle cx="25" cy="32" r="6" fill="black" />
-        <circle cx="55" cy="32" r="6" fill="black" />
-      </svg>
-    </div>
-    <style>{`
-      @keyframes carMove {
-        0% { left: -100px; }
-        100% { left: 100%; }
-      }
-      .animate-car {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        animation: carMove 5s linear infinite;
-      }
-    `}</style>
+  <div className="flex justify-center items-center h-64">
+    <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
   </div>
 );
-
 
 const CarForm = ({
   brands,

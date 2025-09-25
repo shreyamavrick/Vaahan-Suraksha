@@ -36,7 +36,7 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const { user, logout } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
+ 
   const handleLogout = () => {
     logout();
     navigate("/", { replace: true });

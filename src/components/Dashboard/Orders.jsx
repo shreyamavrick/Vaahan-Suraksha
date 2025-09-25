@@ -25,12 +25,7 @@ const Orders = () => {
     fetchOrders();
   }, []);
 
-  const toggleServices = (orderId) => {
-    setExpandedOrders((prev) => ({
-      ...prev,
-      [orderId]: !prev[orderId],
-    }));
-  };
+
 
   const oneTimeOrders = orders.filter((o) => o.type === "oneTime");
   const monthlyOrders = orders.filter((o) => o.type === "monthly");

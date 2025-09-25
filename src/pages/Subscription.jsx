@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useUser } from "../context/UserContext";
+import OneTimePlans from "../components/plans/OneTimePlans";
 
 const PLANS_URL =
   "https://vaahan-suraksha-backend.vercel.app/api/v1/service/subscription/";
@@ -11,7 +12,7 @@ const currency = (n) =>
   typeof n === "number"
     ? n.toLocaleString("en-IN", { style: "currency", currency: "INR" })
     : "—";
-
+ 
 const getFirstPricingKey = (pricingObj) => {
   if (!pricingObj || typeof pricingObj !== "object") return null;
   const keys = Object.keys(pricingObj);
@@ -134,7 +135,6 @@ export default function Subscription() {
     );
   };
 
-  // exclude current plan if subscribed
   const filteredPlans = useMemo(() => {
     if (!user?.currentPlan?.subscriptionId) return plans;
     return plans.filter((p) => p._id !== user.currentPlan.subscriptionId);
@@ -157,7 +157,7 @@ export default function Subscription() {
     <section className="py-14 bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <header className="mb-10">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900"> 
             Subscription Plans
           </h1>
           <p className="text-gray-600 mt-2">
@@ -326,6 +326,8 @@ export default function Subscription() {
           Prices are indicative. Taxes may apply. Only one active plan per user.
         </div>
       </div>
+    <OneTimePlans/>
     </section>
+    
   );
 }

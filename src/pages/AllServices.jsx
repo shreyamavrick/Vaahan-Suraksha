@@ -12,7 +12,6 @@ const AllServices = () => {
   const { addToCart, isInCart, cart } = useCart(); 
   const navigate = useNavigate();
 
-  // Load saved car for logged-in user
   useEffect(() => {
     if (isAuthenticated && user?._id) {
       const savedCar = localStorage.getItem(`car_${user._id}`);
@@ -26,7 +25,6 @@ const AllServices = () => {
     }
   }, [isAuthenticated, user, setVehicle]);
 
-  // Fetch all services
   useEffect(() => {
     const fetchServices = async () => {
       try {

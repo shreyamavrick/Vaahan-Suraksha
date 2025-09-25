@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useVehicle } from "../../context/vehicleContext";
 import { useUser } from "../../context/UserContext";
+
 import hero_img_1 from "../../assets/hero_img_1.jpg";
 import hero_img_2 from "../../assets/hero_img_2.jpg";
 import hero_img_3 from "../../assets/hero_img_3.jpg";
-
+  
 const slides = [
   {
     image: hero_img_1,
@@ -17,21 +18,19 @@ const slides = [
   },
   {
     image: hero_img_2,
-    tagline: "Keeo Your Vehicle Running Smoothly",
+    tagline: "Keep Your Vehicle Running Smoothly",
     title: "Advanced Vehicle Care",
     highlight: "Quality Service",
-    subtitle: "Diagnostics, Repairs and Upgrades, All at one place",
+    subtitle: "Diagnostics, Repairs and Upgrades, All at one place.",
   },
   {
     image: hero_img_3,
     tagline: "YOUR CAR, YOUR CHOICE!",
     title: "Custom Services",
     highlight: "At Your Doorstep",
-    subtitle: "Book a service & get an expert at your location",
+    subtitle: "Book a service & get an expert at your location.",
   },
 ];
-// console.log("Slides:", slides);
-
 
 const DOT_BG = "bg-[#49AEFE]/90 hover:bg-[#49AEFE]/60";
 
@@ -55,6 +54,7 @@ const HeroSection = () => {
 
   const fuelTypes = useMemo(() => ["Petrol", "Diesel", "CNG", "Electric"], []);
 
+ 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -77,7 +77,8 @@ const HeroSection = () => {
         .catch((err) => console.error("Error fetching brands:", err));
     }
   }, [step, brands.length]);
-
+    
+ 
   useEffect(() => {
     if (!selectedBrandId) return;
     axios
@@ -120,6 +121,7 @@ const HeroSection = () => {
 
   const getBrandImage = (name) =>
     `/images/brands/${name.toLowerCase().replace(/\s+/g, "_")}.png`;
+
   const getModelImage = (name) =>
     `/images/models/${name.toLowerCase().replace(/\s+/g, "_")}.png`;
 
@@ -130,7 +132,7 @@ const HeroSection = () => {
 
   return (
     <div className="w-full container mx-auto md:mt-4">
-      {/* ===================== DESKTOP (md+) ===================== */}
+      
       <div className="hidden md:block relative w-full h-[550px] rounded-3xl overflow-hidden">
         {slides.map((slide, index) => {
           const isActive = index === currentSlide;
@@ -174,8 +176,6 @@ const HeroSection = () => {
                         Our Services
                       </button>
                     </div>
-                    
-
 
                     {/* Right form */}
                     <div className="w-full max-w-[340px] ml-6">
@@ -212,7 +212,6 @@ const HeroSection = () => {
           );
         })}
 
-        {/* Right vertical dots */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 flex flex-col items-center gap-4 py-8 px-4 bg-[#f0f2f4] rounded-l-full">
           {slides.map((_, i) => (
             <button
@@ -227,41 +226,36 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* ===================== MOBILE (<md) ===================== */}
+      
       <div className="md:hidden w-full">
-  {/* Background with full cover */}
-  <div
-    className="relative w-full min-h-[320px] bg-cover bg-center"
-    style={{ backgroundImage: `url(${slides[currentSlide].image})` }}
-  >
-    {/* Dark overlay */}
-    <div className="absolute inset-0 bg-black/40" />
+        
+        <div
+          className="relative w-full min-h-[320px] bg-cover bg-center"
+          style={{ backgroundImage: `url(${slides[currentSlide].image})` }}
+        >
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="relative z-10 flex flex-col items-start text-start text-white px-10 py-15 h-full">
+            <p className="text-xs uppercase tracking-wider mb-2">
+              {slides[currentSlide].tagline}
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-bold leading-tight">
+              {slides[currentSlide].title}
+            </h2>
+            <h3 className="text-2xl sm:text-4xl font-bold leading-tight mt-2 mb-2">
+              {slides[currentSlide].highlight}
+            </h3>
+            <p className="text-sm sm:text-base max-w-xs mb-4">
+              {slides[currentSlide].subtitle}
+            </p>
+            <button
+              onClick={() => navigate("/allservices")}
+              className="bg-[#49AEFE] text-white px-6 py-2 rounded-full hover:bg-blue-600 transition-colors"
+            >
+              Our Services
+            </button>
+          </div>
+        </div>
 
-    {/* Centered text */}
-    <div className="relative z-10 flex flex-col items-start text-start text-white px-6 py-15 h-full">
-      <p className="text-xs uppercase tracking-wider mb-2">
-        {slides[currentSlide].tagline}
-      </p>
-      <h2 className="text-2xl sm:text-3xl font-bold leading-tight">
-        {slides[currentSlide].title}
-      </h2>
-      <h3 className="text-2xl sm:text-4xl font-bold leading-tight mt-2 mb-2">
-        {slides[currentSlide].highlight}
-      </h3>
-      <p className="text-sm sm:text-base max-w-xs mb-4">
-        {slides[currentSlide].subtitle}
-      </p>
-      <button
-        onClick={() => navigate("/allservices")}
-        className="bg-[#49AEFE] text-white px-6 py-2 rounded-full hover:bg-blue-600 transition-colors"
-      >
-        Our Services
-      </button>
-    </div>
-  </div>
-
-
-        {/* Form below (fully visible) */}
         <div className="px-4 py-6">
           <FormBox
             step={step}
@@ -294,7 +288,7 @@ const HeroSection = () => {
   );
 };
 
-/** Reusable form box (same in mobile & desktop) */
+  
 const FormBox = ({
   step,
   setStep,
@@ -322,7 +316,6 @@ const FormBox = ({
 }) => {
   return (
     <div className="bg-white/95 backdrop-blur rounded-xl shadow-xl px-6 py-7 w-full">
-      {/* Heading only on step 1 */}
       {step === 1 && (
         <>
           <h2 className="text-xl font-bold text-gray-900 text-center mb-1">
@@ -469,7 +462,7 @@ const FormBox = ({
         </p>
       )}
 
-      {/* Ratings only Step 1 */}
+      
       {step === 1 && (
         <div className="flex items-center justify-between mt-4 border-t border-gray-200 text-gray-700 text-sm">
           <div className="flex items-center gap-1">

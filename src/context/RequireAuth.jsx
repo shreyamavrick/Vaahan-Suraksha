@@ -10,5 +10,5 @@ export default function RequireAuth() {
     return <Navigate to="/" replace />;
   }
 
-  return <Outlet />; // Render child routes only if authenticated
+  return <Outlet />; 
 }
