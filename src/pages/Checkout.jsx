@@ -25,7 +25,6 @@ export default function MonthlyCheckout() {
 
   const planId = searchParams.get("planId");
   const pricingKey = searchParams.get("pricingKey");
-  const pricingType = searchParams.get("pricingType") || "monthlyPrice";
 
   useEffect(() => {
     if (!planId) {
@@ -71,7 +70,7 @@ export default function MonthlyCheckout() {
 
   const handlePay = async () => {
     if (!isAuthenticated) {
-      navigate(`/login?redirect=/monthly-checkout?planId=${planId}&pricingKey=${pricingKey}&pricingType=${pricingType}`);
+      navigate(`/login?redirect=/monthly-checkout?planId=${planId}&pricingKey=${pricingKey}`);
       return;
     }
 
@@ -85,7 +84,7 @@ export default function MonthlyCheckout() {
     try {
       const token = localStorage.getItem("token");
       const serviceIds = plan.services?.map((s) => (typeof s === "string" ? s : s._id));
-      const price = plan.pricing?.[pricingKey]?.[pricingType];
+      const price = plan.pricing?.[pricingKey]?.price;
       const limit = plan.limit || 30;
 
       if (!price) {
@@ -141,13 +140,10 @@ export default function MonthlyCheckout() {
             console.log("Verify subscription response:", verifyJson);
 
             if (verifyJson.success) {
-              // ✅ Directly update user context
               login({
                 accessToken: token,
                 user: verifyJson.data.user,
               });
-
-              // ✅ Redirect to MyPlan
               navigate("/dashboard/myplan");
             } else {
               alert("Subscription verification failed");
@@ -180,21 +176,22 @@ export default function MonthlyCheckout() {
   if (err)
     return <div className="min-h-[60vh] grid place-items-center text-red-600">{err}</div>;
 
-  const selectedTier = plan?.pricing?.[pricingKey];
-  const price = selectedTier?.[pricingType];
+  const firstPricingKey = Object.keys(plan?.pricing || {})[0]; // fallback
+  const selectedTier = plan?.pricing?.[pricingKey || firstPricingKey];
+  const price = selectedTier?.price;
 
   return (
     <section className="min-h-screen py-14 bg-gradient-to-b from-indigo-50 to-white flex justify-center px-4">
       <div className="w-full max-w-3xl bg-white rounded-xl shadow-lg p-8 sm:p-12">
         <h1 className="text-3xl font-extrabold mb-6 text-gray-900 text-center sm:text-left">
-          Monthly Subscription Checkout
+          Subscription Checkout
         </h1>
 
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-800 mb-1">Selected Plan</h2>
           <p className="text-gray-700 text-lg font-medium">{plan.name}</p>
           <p className="text-sm text-gray-500 mt-1">
-            Tier: <span className="capitalize">{pricingKey}</span> · Monthly
+            Tier: <span className="capitalize">{pricingKey || firstPricingKey}</span> · Monthly
           </p>
           <p className="mt-3 text-2xl font-bold text-indigo-600">{currency(price)}</p>
         </div>

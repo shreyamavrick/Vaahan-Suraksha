@@ -1,20 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useUser } from "../context/UserContext"; // optional; remove if not used
+import { useUser } from "../context/UserContext";
 
 const ONE_TIME_PLANS_URL = "https://vaahan-suraksha-backend.vercel.app/api/v1/oneTime/";
 const BRANDS_API = "https://vaahan-suraksha-backend.vercel.app/api/v1/car/brand/";
-const MODELS_API = "https://vaahan-suraksha-backend.vercel.app/api/v1/car/model/"; // append brandId
+const MODELS_API = "https://vaahan-suraksha-backend.vercel.app/api/v1/car/model/";
 const CREATE_ORDER_API = "https://vaahan-suraksha-backend.vercel.app/api/v1/order/oneTime/create";
 const VERIFY_ORDER_API = "https://vaahan-suraksha-backend.vercel.app/api/v1/order/oneTime/verify";
 
-const currency = (n) => (typeof n === "number" ? n.toLocaleString("en-IN", { style: "currency", currency: "INR" }) : "—");
+const currency = (n) =>
+  typeof n === "number" ? n.toLocaleString("en-IN", { style: "currency", currency: "INR" }) : "—";
 
 export default function CheckoutOneTime() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useUser(); // if you don't have this context, remove and handle auth differently
+  const { isAuthenticated, user } = useUser();
 
   const planId = searchParams.get("planId");
   const pricingType = "oneTimePrice";
@@ -38,15 +39,14 @@ export default function CheckoutOneTime() {
     location: "",
   });
 
-  // 1) Fetch plans list and find plan by id (safer than assuming /:id exists)
+  const locationRef = useRef(null); 
+
   useEffect(() => {
     let mounted = true;
     async function loadPlan() {
       if (!planId) {
-        if (mounted) {
-          setErr("No plan selected.");
-          setLoading(false);
-        }
+        setErr("No plan selected.");
+        setLoading(false);
         return;
       }
       try {
@@ -71,19 +71,16 @@ export default function CheckoutOneTime() {
       }
     }
     loadPlan();
-    return () => {
-      mounted = false;
-    };
+    return () => (mounted = false);
   }, [planId]);
 
-  // 2) Fetch brands
+  // Load brands
   useEffect(() => {
     let mounted = true;
     axios
       .get(BRANDS_API)
       .then((res) => {
         if (!mounted) return;
-        console.log("brands:", res.data);
         if (res.data?.success) setBrands(res.data.data || []);
         else setBrands([]);
       })
@@ -94,7 +91,6 @@ export default function CheckoutOneTime() {
     return () => (mounted = false);
   }, []);
 
-  // 3) Fetch models for selected brand
   useEffect(() => {
     if (!selectedBrand) {
       setModels([]);
@@ -106,22 +102,16 @@ export default function CheckoutOneTime() {
       try {
         const res = await axios.get(`${MODELS_API}${selectedBrand}`);
         if (cancelled) return;
-        if (res.data?.success) {
-          setModels(res.data.data || []);
-        } else {
-          setModels([]);
-        }
+        if (res.data?.success) setModels(res.data.data || []);
+        else setModels([]);
       } catch (e) {
         console.error("Models fetch error:", e);
         setModels([]);
       }
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => (cancelled = true);
   }, [selectedBrand]);
 
-  // 4) When model selected update carType and price (support both pricing shapes)
   useEffect(() => {
     if (!selectedModel || !plan || !models.length) {
       setCarType("");
@@ -138,19 +128,15 @@ export default function CheckoutOneTime() {
     setCarType(resolvedCarType);
 
     const planPricingEntry = plan.pricing?.[resolvedCarType];
-    // support numeric or nested shape
     let resolvedPrice = null;
     if (typeof planPricingEntry === "number") resolvedPrice = planPricingEntry;
     else if (planPricingEntry && typeof planPricingEntry === "object") {
-      // commonly might be { oneTimePrice: 5000 } or { price: 5000 }
       resolvedPrice = planPricingEntry.oneTimePrice ?? planPricingEntry.price ?? null;
     }
     setPrice(resolvedPrice ?? null);
   }, [selectedModel, plan, models]);
 
-  // 5) Prefill user details if user context present and clear local storage if belongs to other user
   useEffect(() => {
-    // If you want to persist the form per user, include user.uid when storing; here we only prefill.
     if (!user) return;
     setFormData((prev) => ({
       ...prev,
@@ -158,21 +144,32 @@ export default function CheckoutOneTime() {
       phone: user.phone ?? prev.phone,
     }));
 
-    // Optional: restore saved form only if belongs to same user
     try {
       const saved = localStorage.getItem("checkoutForm");
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed?.userId && parsed.userId === user.uid) {
           setFormData((prev) => ({ ...prev, ...parsed }));
-        } else {
-          // do not restore form from other user
         }
       }
-    } catch (e) {
-      // ignore
-    }
+    } catch {}
   }, [user]);
+
+  // Google Maps Autocomplete
+  useEffect(() => {
+    if (!window.google || !locationRef.current) return;
+
+    const autocomplete = new window.google.maps.places.Autocomplete(locationRef.current, {
+      types: ["geocode"],
+      componentRestrictions: { country: "IN" },
+    });
+
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+      if (!place.geometry) return;
+      setFormData((prev) => ({ ...prev, location: place.formatted_address }));
+    });
+  }, []);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -211,7 +208,6 @@ export default function CheckoutOneTime() {
   const handlePay = async () => {
     if (!validate()) return;
     if (!isAuthenticated) {
-      // redirect to login; after login redirect back to this page with same query params
       navigate(`/login?redirect=/checkout-onetime?planId=${planId}`);
       return;
     }
@@ -233,19 +229,12 @@ export default function CheckoutOneTime() {
         serviceIds,
       };
 
-      // 1) Create order
       const createRes = await axios.post(CREATE_ORDER_API, payload, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: token ? `Bearer ${token}` : "",
-        },
+        headers: { "Content-Type": "application/json", Authorization: token ? `Bearer ${token}` : "" },
       });
 
-      if (!createRes.data?.success) {
-        throw new Error(createRes.data?.message || "Order creation failed");
-      }
+      if (!createRes.data?.success) throw new Error(createRes.data?.message || "Order creation failed");
 
-      // API expected to return { data: { razorpayOrderId, amount, currency, key, newOrderId } }
       const orderData = createRes.data.data;
       const razorKey = orderData.key;
       const razorOrderId = orderData.razorpayOrderId ?? orderData.orderId ?? orderData.razorpay_order_id;
@@ -254,8 +243,6 @@ export default function CheckoutOneTime() {
       const newOrderId = orderData.newOrderId ?? orderData.orderId;
 
       if (!window.Razorpay) {
-        // if Razorpay lib is not loaded — load script dynamically or instruct dev
-        console.error("Razorpay not found on window. Make sure Razorpay script is loaded.");
         alert("Payment gateway not available. Try again later.");
         setProcessing(false);
         return;
@@ -268,9 +255,8 @@ export default function CheckoutOneTime() {
         order_id: razorOrderId,
         name: plan.name || "Vaahan Suraksha",
         description: "One-time plan purchase",
-        handler: async function (razorResp) {
+        handler: async (razorResp) => {
           try {
-            // verify payment
             const verifyRes = await axios.post(
               VERIFY_ORDER_API,
               {
@@ -279,34 +265,21 @@ export default function CheckoutOneTime() {
                 razorpay_signature: razorResp.razorpay_signature,
                 orderId: newOrderId,
               },
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: token ? `Bearer ${token}` : "",
-                },
-              }
+              { headers: { "Content-Type": "application/json", Authorization: token ? `Bearer ${token}` : "" } }
             );
-            if (verifyRes.data?.success) {
-              // success -> navigate to orders
-              navigate("/dashboard/orders");
-            } else {
-              alert(verifyRes.data?.message || "Payment verification failed");
-            }
+            if (verifyRes.data?.success) navigate("/dashboard/orders");
+            else alert(verifyRes.data?.message || "Payment verification failed");
           } catch (verifyErr) {
             console.error("Payment verify error:", verifyErr);
             alert("Payment verification failed. Contact support.");
           }
         },
-        prefill: {
-          name: formData.name,
-          contact: formData.phone,
-        },
+        prefill: { name: formData.name, contact: formData.phone },
         theme: { color: "#2563eb" },
         modal: { ondismiss: () => setProcessing(false) },
       };
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+      new window.Razorpay(options).open();
     } catch (e) {
       console.error("Create order error:", e);
       alert(e?.response?.data?.message ?? e.message ?? "Failed to create order");
@@ -315,30 +288,36 @@ export default function CheckoutOneTime() {
     }
   };
 
-  if (loading) {
-    return <div className="min-h-[60vh] grid place-items-center">Loading checkout...</div>;
-  }
+  // Use Current Location
+  const useCurrentLocation = () => {
+    if (!navigator.geolocation) return alert("Geolocation not supported");
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const res = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyCRU37T92r35E6HEo-qcWiphvjqBAwIhCk`
+        );
+        const data = await res.json();
+        if (data.results?.[0]?.formatted_address)
+          setFormData((prev) => ({ ...prev, location: data.results[0].formatted_address }));
+      },
+      (err) => alert("Unable to fetch location: " + err.message)
+    );
+  };
 
-  if (!plan) {
-    return <div className="min-h-[60vh] grid place-items-center text-red-600">Selected plan not found.</div>;
-  }
+  if (loading) return <div className="min-h-[60vh] grid place-items-center">Loading checkout...</div>;
+  if (!plan) return <div className="min-h-[60vh] grid place-items-center text-red-600">Selected plan not found.</div>;
 
   return (
     <section className="min-h-screen py-14 bg-gradient-to-b from-indigo-50 to-white flex justify-center px-4">
       <div className="w-full max-w-3xl bg-white rounded-xl shadow-lg p-8 sm:p-12">
         <h1 className="text-3xl font-extrabold mb-6 text-gray-900 text-center sm:text-left">Checkout</h1>
 
-        {/* Plan preview */}
         <div className="mb-6 p-4 border rounded-lg bg-indigo-50">
           <h2 className="text-xl font-bold text-gray-800">{plan.name}</h2>
-          {carType ? (
-            <p className="text-indigo-600 font-semibold text-lg">Price: ₹{price ?? "—"}</p>
-          ) : (
-            <p className="text-gray-500">Select brand & model to see price</p>
-          )}
+          {carType ? <p className="text-indigo-600 font-semibold text-lg">Price: ₹{price ?? "—"}</p> : <p className="text-gray-500">Select brand & model to see price</p>}
         </div>
 
-        {/* Form */}
         <div className="space-y-4 mb-6">
           <div>
             <label className="block text-gray-700 font-medium mb-1">Full Name</label>
@@ -347,7 +326,7 @@ export default function CheckoutOneTime() {
 
           <div>
             <label className="block text-gray-700 font-medium mb-1">Phone</label>
-            <input type="tel" name="phone" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full border p-3 rounded-lg" />
+            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full border p-3 rounded-lg" />
           </div>
 
           <div>
@@ -357,19 +336,15 @@ export default function CheckoutOneTime() {
 
           <div>
             <label className="block text-gray-700 font-medium mb-1">Location</label>
-            <input id="location-input" type="text" name="location" value={formData.location} onChange={handleChange} className="w-full border p-3 rounded-lg" />
+            <input ref={locationRef} type="text" name="location" value={formData.location} onChange={handleChange} className="w-full border p-3 rounded-lg" placeholder="Enter your address" />
+            <button type="button" onClick={useCurrentLocation} className="mt-2 text-sm text-indigo-600 underline">Use Current Location</button>
           </div>
 
-          {/* Brand & Model selects */}
           <div>
             <label className="block text-gray-700 font-medium mb-1">Car Brand</label>
             <select value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)} className="w-full border p-3 rounded-lg">
               <option value="">Select Brand</option>
-              {brands.map((b) => (
-                <option key={b._id} value={b._id}>
-                  {b.name}
-                </option>
-              ))}
+              {brands.map((b) => (<option key={b._id} value={b._id}>{b.name}</option>))}
             </select>
           </div>
 
@@ -378,11 +353,7 @@ export default function CheckoutOneTime() {
               <label className="block text-gray-700 font-medium mb-1">Car Model</label>
               <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)} className="w-full border p-3 rounded-lg">
                 <option value="">Select Model</option>
-                {models.map((m) => (
-                  <option key={m._id} value={m._id}>
-                    {m.name} ({m.carType})
-                  </option>
-                ))}
+                {models.map((m) => (<option key={m._id} value={m._id}>{m.name} ({m.carType})</option>))}
               </select>
             </div>
           )}
@@ -393,9 +364,7 @@ export default function CheckoutOneTime() {
         <div className="mb-6">
           <p className="text-sm text-gray-600">Included services:</p>
           <ul className="list-disc ml-5 mt-2 text-gray-700">
-            {plan.services?.map((s) => (
-              <li key={typeof s === "string" ? s : s._id}>{typeof s === "string" ? s : s.name}</li>
-            ))}
+            {plan.services?.map((s) => (<li key={typeof s === "string" ? s : s._id}>{typeof s === "string" ? s : s.name}</li>))}
           </ul>
         </div>
 
@@ -410,3 +379,4 @@ export default function CheckoutOneTime() {
     </section>
   );
 }
+  76432 
