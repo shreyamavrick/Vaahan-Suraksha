@@ -378,5 +378,4 @@ export default function CheckoutOneTime() {
       </div>
     </section>
   );
-}
-  76432 
+} 

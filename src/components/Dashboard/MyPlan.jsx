@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"; 
 import { useUser } from "../../context/UserContext";
 import axios from "axios";
 
@@ -20,13 +20,10 @@ export default function MyPlan() {
           const res = await axios.get(
             "https://vaahan-suraksha-backend.vercel.app/api/v1/service/"
           );
-
           const allServices = res.data.data || [];
-
           const matched = allServices.filter((s) =>
             currentPlan.services.includes(s._id)
           );
-
           setServices(matched);
         } catch (error) {
           console.error("Error fetching services:", error);
@@ -40,42 +37,50 @@ export default function MyPlan() {
   }, [currentPlan]); 
 
   return (
-    <section className="min-h-[70vh] flex justify-center items-center bg-gray-50 px-4 py-12">
-      <div className="w-full max-w-2xl bg-white rounded-xl shadow-lg p-8 text-center">
-        <h1 className="text-3xl font-bold mb-6 text-gray-900 flex justify-center items-center gap-3">
-          
-          My Plan
-        </h1>
+    <section className="min-h-[70vh] flex justify-center items-start bg-gray-50 px-4 py-12">
+      <div className="w-full max-w-3xl">
+
+        <h1 className="text-3xl font-bold text-gray-900 mb-8 ">My Plan</h1>
 
         {isSubscribed && currentPlan ? (
-          <div className="space-y-4">
-            <p className="text-lg font-semibold text-indigo-600">{currentPlan.name}</p>
-            <p className="text-gray-700">
-              Price: <span className="font-medium">₹{currentPlan.price}/month</span>
-            </p>
-            <p className="text-gray-600">
-              Limit: {currentPlan.limit || 0}
-            </p>
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+            {/* Header: Plan name and status */}
+            <div className="bg-indigo-600 p-6 flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold text-white">{currentPlan.name}</h2>
+                <p className="text-indigo-100 font-bold mt-1 text-sm">
+                  {currentPlan.duration} {currentPlan.durationUnit} Limit: {currentPlan.limit}
+                </p>
+              </div>
+              <span className="bg-green-100 text-green-800 text-sm font-semibold px-3 py-1 rounded-full">
+                Active
+              </span>
+            </div>
 
+            {/* Pricing */}
+            <div className="p-6 flex justify-between items-center border-b border-gray-100">
+              <p className="text-gray-700 font-medium">Price:</p>
+              <p className="text-2xl font-bold text-gray-900">₹{currentPlan.price}</p>
+            </div>
+
+            {/* Services */}
             {services.length > 0 && (
-              <div className="mt-4">
-                <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                  Included Services:
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <div className="p-6">
+                <h3 className="text-gray-800 font-semibold mb-3">Included Services:</h3>
+                <div className="flex flex-wrap gap-2">
                   {services.map((service) => (
                     <div
                       key={service._id}
-                      className="text-center bg-gray-50 rounded-lg shadow-sm p-3"
+                      className="flex items-center gap-2 bg-gray-50 rounded-full px-3 py-1 shadow-sm text-sm font-medium"
                     >
-                      {service.images?.length > 0 && (
+                      {service.images?.[0] && (
                         <img
                           src={service.images[0]}
                           alt={service.name}
-                          className="w-full h-20 object-cover rounded-md"
+                          className="w-6 h-6 rounded-full object-cover"
                         />
                       )}
-                      <p className="text-xs mt-1 font-medium">{service.name}</p>
+                      {service.name}
                     </div>
                   ))}
                 </div>
@@ -83,7 +88,7 @@ export default function MyPlan() {
             )}
           </div>
         ) : (
-          <p className="text-gray-600">You don’t have any active subscription.</p>
+          <p className="text-gray-600 text-center">You don’t have any active subscription.</p>
         )}
       </div>
     </section>

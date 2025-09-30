@@ -1,8 +1,10 @@
 import { useCart } from "../context/cartContext";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 const CartPage = () => {
   const { cart, removeFromCart, clearCart, subtotal } = useCart();
+  const { user } = useUser();
   const navigate = useNavigate();
 
   if (!cart || cart.length === 0) {
@@ -18,6 +20,21 @@ const CartPage = () => {
       </div>
     );
   }
+
+  const handleCheckout = () => {
+    if (!user?.currentPlan?.subscriptionId) {
+      alert("No active subscription found! Please purchase a plan first.");
+      return;
+    }
+
+    const checkoutData = {
+      cart,
+      planId: user.currentPlan.subscriptionId, // save plan ID for subscription checkout
+    };
+
+    localStorage.setItem("checkoutData", JSON.stringify(checkoutData));
+    navigate("/checkout-subs"); // route for subscription checkout
+  };
 
   return (
     <section className="py-16 max-w-4xl mx-auto px-6">
@@ -57,7 +74,7 @@ const CartPage = () => {
               Clear Cart
             </button>
             <button
-              onClick={() => alert("Proceeding to checkout...")}
+              onClick={handleCheckout}
               className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
               Checkout
