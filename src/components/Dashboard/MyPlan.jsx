@@ -83,7 +83,7 @@ export default function MyPlan() {
                       {service.name}
                     </div>
                   ))}
-                </div>
+                </div> 
               </div>
             )}
           </div>

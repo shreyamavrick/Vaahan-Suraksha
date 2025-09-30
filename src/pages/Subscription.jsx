@@ -100,15 +100,26 @@ export default function Subscription() {
   }
 
   if (!isAuthenticated) {
-    navigate(
-      `/login?redirect=/checkout?planId=${plan._id}&pricingKey=${firstPricingKey}&pricingType=monthlyPrice`
-    );
+    // Redirect to login first
+    const redirectUrl = user?.currentPlan?.subscriptionId
+      ? `/checkout-upgrade?planId=${plan._id}&pricingKey=${firstPricingKey}&pricingType=monthlyPrice`
+      : `/checkout?planId=${plan._id}&pricingKey=${firstPricingKey}&pricingType=monthlyPrice`;
+
+    navigate(`/login?redirect=${redirectUrl}`);
     return;
   }
 
-  navigate(
-    `/checkout?planId=${plan._id}&pricingKey=${firstPricingKey}&pricingType=monthlyPrice`
-  );
+  if (user?.currentPlan?.subscriptionId) {
+    // User has an existing plan → go to Upgrade checkout
+    navigate(
+      `/checkout-upgrade?planId=${plan._id}&pricingKey=${firstPricingKey}&pricingType=monthlyPrice`
+    );
+  } else {
+    // New subscription → go to normal checkout
+    navigate(
+      `/checkout?planId=${plan._id}&pricingKey=${firstPricingKey}&pricingType=monthlyPrice`
+    );
+  }
 };
 
 

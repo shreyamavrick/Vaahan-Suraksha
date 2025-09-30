@@ -20,6 +20,7 @@ import Subscription from "./pages/Subscription";
 import Onetimecheckout from "./pages/Onetime-checkout";
 import MyPlan from "./components/Dashboard/MyPlan";
 import AfterSubsCheckout from "./pages/afterSubsCheckout"
+import UpgradeCheckout from "./pages/UpgradeCheckout"
 
 
 
@@ -40,6 +41,7 @@ function App() {
         <Route path="/subscription" element={<Subscription />} />
         <Route path="/checkout-onetime" element={<Onetimecheckout />} />
         <Route path="/checkout-subs" element={<AfterSubsCheckout />} />
+        <Route path="/checkout-upgrade" element={<UpgradeCheckout />} />
         
         <Route path="/dashboard" element={<DashboardLayout />} >
           <Route path="/dashboard/profile" element={<Profile />} />
