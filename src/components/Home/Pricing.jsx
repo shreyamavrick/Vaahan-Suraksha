@@ -43,13 +43,14 @@ const Pricing = () => {
 
             {/* Price */}
             <div className="mb-4">
-              <p className="text-4xl font-bold text-black">
-                ₹{plan.pricing?.["1"]?.monthlyPrice || "N/A"}
-              </p>
-              <p className="text-sm text-neutral-400">
-                / {plan.duration} {plan.durationUnit}
-              </p>
-            </div>
+  <p className="text-4xl font-bold text-black">
+    ₹{plan.pricing?.["1"]?.price || "N/A"}
+  </p>
+  <p className="text-sm text-neutral-400">
+    / {plan.duration} {plan.durationUnit}
+  </p>
+</div>
+
 
             {/* Limit above services */}
             <div className="flex items-center gap-2 text-blue-600 mb-4">

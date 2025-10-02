@@ -29,11 +29,11 @@ const CartPage = () => {
 
     const checkoutData = {
       cart,
-      planId: user.currentPlan.subscriptionId, // save plan ID for subscription checkout
+      planId: user.currentPlan.subscriptionId, 
     };
 
     localStorage.setItem("checkoutData", JSON.stringify(checkoutData));
-    navigate("/checkout-subs"); // route for subscription checkout
+    navigate("/checkout-subs"); 
   };
 
   return (

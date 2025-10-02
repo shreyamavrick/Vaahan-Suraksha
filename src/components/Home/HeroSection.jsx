@@ -315,10 +315,10 @@ const FormBox = ({
   navigate,
 }) => {
   return (
-    <div className="bg-white/95 backdrop-blur rounded-xl shadow-xl px-6 py-7 w-full">
+    <div className="bg-white rounded-lg shadow-lg border border-gray-200 px-6 py-7 w-full">
       {step === 1 && (
         <>
-          <h2 className="text-xl font-bold text-gray-900 text-center mb-1">
+          <h2 className="text-lg font-semibold text-gray-900 text-center mb-1">
             Experience The Best Car Services In Delhi
           </h2>
           <p className="text-sm text-gray-600 text-center mb-5">
@@ -332,12 +332,13 @@ const FormBox = ({
           {step > 1 && (
             <button
               onClick={() => setStep(step - 1)}
-              className="text-sm text-blue-600 mb-2 hover:underline"
+              className="text-sm text-blue-600 mb-3 hover:underline"
             >
               ← Back
             </button>
           )}
 
+          {/* STEP 1 */}
           {step === 1 && (
             <>
               <input
@@ -345,7 +346,7 @@ const FormBox = ({
                 placeholder="Enter City"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full mb-2.5 p-3 border border-gray-300 rounded-md text-sm"
+                className="w-full mb-3 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none"
               />
               {errors.location && (
                 <p className="text-red-500 text-xs mb-2">{errors.location}</p>
@@ -356,7 +357,7 @@ const FormBox = ({
                 placeholder="Enter Mobile Number"
                 value={mobile}
                 onChange={(e) => setMobile(e.target.value)}
-                className="w-full mb-2.5 p-3 border border-gray-300 rounded-md text-sm"
+                className="w-full mb-3 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none"
               />
               {errors.mobile && (
                 <p className="text-red-500 text-xs mb-2">{errors.mobile}</p>
@@ -364,13 +365,14 @@ const FormBox = ({
 
               <button
                 onClick={handleNext}
-                className="w-full bg-[#49AEFE] hover:bg-blue-600 text-white font-semibold py-3 rounded-md mt-1"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-md transition-all"
               >
                 Continue
               </button>
             </>
           )}
 
+          {/* STEP 2 */}
           {step === 2 && (
             <>
               <p className="font-semibold mb-2">Select Manufacturer</p>
@@ -379,7 +381,7 @@ const FormBox = ({
                   <div
                     key={brand._id}
                     onClick={() => handleBrandSelect(brand)}
-                    className="cursor-pointer text-center bg-gray-100 px-2.5 py-2 rounded hover:scale-105 transition"
+                    className="cursor-pointer text-center bg-gray-100 px-2.5 py-2 rounded-md hover:scale-105 transition"
                   >
                     <img
                       src={getBrandImage(brand.name)}
@@ -393,6 +395,7 @@ const FormBox = ({
             </>
           )}
 
+          {/* STEP 3 */}
           {step === 3 && (
             <>
               <p className="font-semibold mb-2">Select Model</p>
@@ -404,7 +407,7 @@ const FormBox = ({
                       setModel(m.name);
                       setStep(4);
                     }}
-                    className="cursor-pointer text-center bg-gray-100 px-2.5 py-2 rounded hover:scale-105 transition"
+                    className="cursor-pointer text-center bg-gray-100 px-2.5 py-2 rounded-md hover:scale-105 transition"
                   >
                     <img
                       src={getModelImage(m.name)}
@@ -418,6 +421,7 @@ const FormBox = ({
             </>
           )}
 
+          {/* STEP 4 */}
           {step === 4 && (
             <>
               <p className="font-semibold mb-2">Select Fuel Type</p>
@@ -429,10 +433,10 @@ const FormBox = ({
                   <div
                     key={f}
                     onClick={() => setFuel(f)}
-                    className={`cursor-pointer p-2 text-center border rounded text-sm ${
+                    className={`cursor-pointer p-2 text-center border rounded-md text-sm transition ${
                       fuel === f
                         ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200"
+                        : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
                     {f}
@@ -441,7 +445,7 @@ const FormBox = ({
               </div>
               <button
                 onClick={handleSubmit}
-                className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded"
+                className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-md transition-all"
               >
                 Check Prices for Free
               </button>
@@ -462,15 +466,15 @@ const FormBox = ({
         </p>
       )}
 
-      
+      {/* Reviews + Customers */}
       {step === 1 && (
-        <div className="flex items-center justify-between mt-4 border-t border-gray-200 text-gray-700 text-sm">
-          <div className="flex items-center gap-1">
-            <span className="text-green-600 font-semibold">★ 4.2/5</span>
-            <span className="ml-1 text-xs">Based on 40000+ Reviews</span>
+        <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200 text-gray-700 text-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-green-600 font-bold">★ 4.2/5</span>
+            <span className="text-xs">Based on 40000+ Reviews</span>
           </div>
           <div className="text-right">
-            <p className="font-semibold text-sm">2 Lakh+</p>
+            <p className="font-bold text-sm">2 Lakh+</p>
             <p className="text-xs">Happy Customers</p>
           </div>
         </div>
@@ -478,5 +482,6 @@ const FormBox = ({
     </div>
   );
 };
+
 
 export default HeroSection;

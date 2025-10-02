@@ -19,8 +19,9 @@ import Addresses from "./components/Dashboard/Addresses";
 import Subscription from "./pages/Subscription";
 import Onetimecheckout from "./pages/Onetime-checkout";
 import MyPlan from "./components/Dashboard/MyPlan";
-import AfterSubsCheckout from "./pages/afterSubsCheckout"
-import UpgradeCheckout from "./pages/UpgradeCheckout"
+import AfterSubsCheckout from "./pages/afterSubsCheckout";
+import UpgradeCheckout from "./pages/UpgradeCheckout";
+import BillingHistory from "./components/Dashboard/BillingHistory";
 
 
 
@@ -50,6 +51,7 @@ function App() {
           <Route path="/dashboard/addresses" element={<Addresses />} />
           {/* <Route path="/dashboard/coins" element={<Coins />} /> */}
           <Route path="/dashboard/myplan" element={<MyPlan />} />
+          <Route path="/dashboard/billingHistory" element={<BillingHistory />} />
         
           
           </Route>
@@ -58,5 +60,6 @@ function App() {
     </Router>
   );
 }
+
 
 export default App;
