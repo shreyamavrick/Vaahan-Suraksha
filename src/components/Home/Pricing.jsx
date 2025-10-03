@@ -34,91 +34,60 @@ const Pricing = () => {
 
       <div className="flex flex-wrap gap-8 justify-center px-4 max-md:flex-col">
         {plans.map((plan, idx) => {
-          const isDark = idx % 2 === 1; // alternate: 0 -> white, 1 -> dark
+          const isDark = idx % 2 === 1; // alternate: 0 -> white, 1 -> black
           return (
             <div
               key={plan._id}
-              className={`relative flex flex-col rounded-3xl p-8 min-w-[300px] max-w-[350px] shadow-lg ${
+              className={`relative flex flex-col rounded-3xl p-8 min-w-[300px] max-w-[350px] shadow-lg transition-transform duration-300 hover:-translate-y-2 ${
                 isDark
-                  ? "bg-vahan_dark text-white"
+                  ? "bg-black text-white"
                   : "bg-white text-black"
               }`}
             >
-              <div className="relative flex flex-col z-10">
-                {/* Header */}
-                <div className="flex flex-col pb-5 border-b border-[#dbdbdb]">
-                  <p
-                    className={`font-bold font-raleway ${
-                      isDark ? "text-white" : "text-black"
-                    }`}
-                  >
-                    {plan.name}
-                  </p>
-                  <div className="flex items-start py-6">
-                    <span
-                      className={`text-3xl md:text-5xl font-bold self-start mr-1 ${
-                        isDark ? "text-white" : "text-black"
-                      }`}
-                    >
-                      ₹
+              {/* Header */}
+              <div className="flex flex-col pb-5 border-b border-[#dbdbdb]">
+                <p className={`font-bold font-raleway`}>
+                  {plan.name}
+                </p>
+                <div className="flex items-start py-6">
+                  <span className={`text-3xl md:text-5xl font-bold self-start mr-1`}>
+                    ₹
+                  </span>
+                  <h1 className={`font-bold font-primary text-6xl md:text-7xl`}>
+                    {plan.pricing?.["1"]?.price || "N/A"}
+                    <span className={`text-xs md:text-base font-light font-raleway ${isDark ? "text-white/70" : "text-black/70"}`}>
+                      / {plan.duration} {plan.durationUnit}
                     </span>
-                    <h1
-                      className={`font-bold font-primary text-6xl md:text-7xl ${
-                        isDark ? "text-white" : "text-black"
-                      }`}
-                    >
-                      {plan.pricing?.["1"]?.price || "N/A"}
-                      <span
-                        className={`text-xs md:text-base font-light font-raleway ${
-                          isDark ? "text-white/70" : "text-black/70"
-                        }`}
-                      >
-                        / {plan.duration} {plan.durationUnit}
-                      </span>
-                    </h1>
-                  </div>
+                  </h1>
                 </div>
+              </div>
 
-                {/* Services List */}
-                <div className="flex-1 overflow-y-auto mt-5 space-y-3 hide-scrollbar">
-                  {plan.services?.length > 0 ? (
-                    plan.services.map((service) => (
-                      <div
-                        key={service._id}
-                        className="flex gap-x-3 items-center"
-                      >
-                        <CheckCircle2
-                          className={`w-6 h-6 ${
-                            isDark ? "text-vahan_secondry" : "text-black"
-                          }`}
-                        />
-                        <p
-                          className={`font-light ${
-                            isDark ? "text-white" : "text-black"
-                          } font-raleway`}
-                        >
-                          {service.name}
-                        </p>
-                      </div>
-                    ))
-                  ) : (
-                    <p
-                      className={`font-light ${
-                        isDark ? "text-white" : "text-black"
-                      } font-raleway`}
-                    >
-                      No services available
-                    </p>
-                  )}
-                </div>
+              {/* Services List */}
+              <div className={`flex-1 mt-5 space-y-3 overflow-y-auto ${isDark ? "scrollbar-blue" : "scrollbar-black"} hide-scrollbar`}>
+                {plan.services?.length > 0 ? (
+                  plan.services.map((service) => (
+                    <div key={service._id} className="flex gap-x-3 items-center">
+                      <CheckCircle2 className={`w-6 h-6 ${isDark ? "text-blue-500" : "text-black"}`} />
+                      <p className={`font-light font-raleway ${isDark ? "text-white" : "text-black"}`}>
+                        {service.name}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className={`font-light font-raleway ${isDark ? "text-white" : "text-black"}`}>
+                    No services available
+                  </p>
+                )}
+              </div><br></br>
 
-                {/* Purchase Button */}
+              {/* Purchase Button */}
+              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
                 <a
                   href="/subscription"
-                  className={`mt-6 py-3 rounded-full text-center font-medium transition-all duration-150 ${
+                  className={`w-max px-6 h-12 flex items-center justify-center rounded-full font-primary text-white transition-all duration-150 ${
                     isDark
-                      ? "bg-blue-600 text-white hover:bg-blue-700"
-                      : "bg-black text-white hover:bg-gray-800"
+                      ? "bg-blue-600 hover:bg-blue-700"
+                      : "bg-black hover:bg-gray-800"
                   }`}
                 >
                   Purchase Now
@@ -131,11 +100,20 @@ const Pricing = () => {
 
       <style>{`
         .hide-scrollbar::-webkit-scrollbar {
-          display: none;
+          width: 8px;
+        }
+        .hide-scrollbar::-webkit-scrollbar-thumb {
+          border-radius: 9999px;
+        }
+        .scrollbar-black::-webkit-scrollbar-thumb {
+          background-color: #000;
+        }
+        .scrollbar-blue::-webkit-scrollbar-thumb {
+          background-color: #3b82f6; /* Tailwind blue-500 */
         }
         .hide-scrollbar {
           -ms-overflow-style: none;
-          scrollbar-width: none;
+          scrollbar-width: thin;
         }
       `}</style>
     </section>
