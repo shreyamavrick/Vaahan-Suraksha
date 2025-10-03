@@ -1,9 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { FaArrowRight } from 'react-icons/fa';
+import React, { useEffect, useRef, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 
-const Services = () => {
+const ServicesEmbla = () => {
   const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  const autoplayRef = useRef(null);
+
+  // Fetch services from API
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -14,16 +19,41 @@ const Services = () => {
         if (data.success) {
           setServices(data.data);
         }
-      } catch (error) {
-        console.error("Error fetching services:", error);
+      } catch (err) {
+        console.error("Failed to fetch services:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchServices();
   }, []);
 
+  // Embla autoplay
+  useEffect(() => {
+    if (!emblaApi || services.length === 0) return;
+
+    const autoplay = () => {
+      if (!emblaApi) return;
+      emblaApi.scrollNext();
+      autoplayRef.current = setTimeout(autoplay, 2000);
+    };
+
+    autoplay();
+
+    return () => clearTimeout(autoplayRef.current);
+  }, [emblaApi, services]);
+
+  if (loading) {
+    return <p className="text-center py-10">Loading services...</p>;
+  }
+
+  if (!services || services.length === 0) {
+    return <p className="text-center py-10">No services available.</p>;
+  }
+
   return (
-    <div className="bg-white py-16">
+    <div className="overflow-hidden py-16">
       <div className="max-w-7xl mx-auto px-6 mb-10">
         <p className="text-blue-500 font-semibold text-sm tracking-wide uppercase">
           / Our Services /
@@ -34,26 +64,25 @@ const Services = () => {
         </h2>
       </div>
 
-      {/* Marquee */}
-      <div className="overflow-hidden relative w-full">
-        <div className="flex w-max animate-marquee gap-6">
-          {[...services, ...services].map((service, index) => (
+      {/* Embla carousel */}
+      <div className="embla" ref={emblaRef}>
+        <div className="flex gap-x-6">
+          {services.map((service, index) => (
             <div
               key={index}
-              className="flex-shrink-0 w-[260px] sm:w-[280px] md:w-[300px] bg-white rounded-3xl shadow-md border p-4"
+              className="flex-shrink-0 w-64 sm:w-72 md:w-80 bg-white rounded-3xl shadow-md p-4"
             >
-              <img
-                src={
-                  service.images?.[0] ||
-                  "https://via.placeholder.com/400x300?text=No+Image"
-                }
-                alt={service.name}
-                className="rounded-2xl w-full h-44 sm:h-48 object-cover mb-4"
-              />
-              <h3 className="text-lg text-center sm:text-xl font-bold mb-1">
-                {service.name}
-              </h3>
-              
+              <div className="overflow-hidden rounded-2xl mb-4">
+                <img
+                  src={
+                    service.images?.[0] ||
+                    "https://via.placeholder.com/400x300?text=No+Image"
+                  }
+                  alt={service.name}
+                  className="w-full h-44 sm:h-48 object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+              <h3 className="font-bold text-lg text-center">{service.name}</h3>
             </div>
           ))}
         </div>
@@ -62,4 +91,4 @@ const Services = () => {
   );
 };
 
-export default Services;
+export default ServicesEmbla;

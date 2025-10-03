@@ -12,7 +12,7 @@ const Pricing = () => {
         );
         const data = await res.json();
         if (data.success) {
-          setPlans(data.data); 
+          setPlans(data.data);
         }
       } catch (error) {
         console.error("Error fetching subscription plans:", error);
@@ -32,58 +32,112 @@ const Pricing = () => {
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-8 justify-center px-4">
-        {plans.map((plan) => (
-          <div
-            key={plan._id}
-            className="flex flex-col justify-between min-w-[300px] max-w-[350px] bg-white p-8 rounded-2xl shadow-lg border border-gray-100 transition-transform hover:scale-105"
-          >
-            {/* Title */}
-            <h3 className="text-xl font-semibold mb-2">{plan.name}</h3>
-
-            {/* Price */}
-            <div className="mb-4">
-  <p className="text-4xl font-bold text-black">
-    ₹{plan.pricing?.["1"]?.price || "N/A"}
-  </p>
-  <p className="text-sm text-neutral-400">
-    / {plan.duration} {plan.durationUnit}
-  </p>
-</div>
-
-
-            {/* Limit above services */}
-            <div className="flex items-center gap-2 text-blue-600 mb-4">
-              <CheckCircle2 className="w-5 h-5" />
-              <span className="text-sm font-medium">
-                Limit: {plan.limit} 
-              </span>
-            </div>
-
-            {/* Services */}
-            <div className="mb-6">
-              <h4 className="font-medium mb-2">Included Services:</h4>
-              <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                {plan.services?.length > 0 ? (
-                  plan.services.map((service) => (
-                    <li key={service._id}>{service.name}</li>
-                  ))
-                ) : (
-                  <li>No services available</li>
-                )}
-              </ul>
-            </div>
-
-            {/* Button */}
-            <a
-              href="/subscription"
-              className="mt-auto block text-center w-full py-3 rounded-lg font-medium border border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white transition"
+      <div className="flex flex-wrap gap-8 justify-center px-4 max-md:flex-col">
+        {plans.map((plan, idx) => {
+          const isDark = idx % 2 === 1; // alternate: 0 -> white, 1 -> dark
+          return (
+            <div
+              key={plan._id}
+              className={`relative flex flex-col rounded-3xl p-8 min-w-[300px] max-w-[350px] shadow-lg ${
+                isDark
+                  ? "bg-vahan_dark text-white"
+                  : "bg-white text-black"
+              }`}
             >
-              Purchase Now
-            </a>
-          </div>
-        ))}
+              <div className="relative flex flex-col z-10">
+                {/* Header */}
+                <div className="flex flex-col pb-5 border-b border-[#dbdbdb]">
+                  <p
+                    className={`font-bold font-raleway ${
+                      isDark ? "text-white" : "text-black"
+                    }`}
+                  >
+                    {plan.name}
+                  </p>
+                  <div className="flex items-start py-6">
+                    <span
+                      className={`text-3xl md:text-5xl font-bold self-start mr-1 ${
+                        isDark ? "text-white" : "text-black"
+                      }`}
+                    >
+                      ₹
+                    </span>
+                    <h1
+                      className={`font-bold font-primary text-6xl md:text-7xl ${
+                        isDark ? "text-white" : "text-black"
+                      }`}
+                    >
+                      {plan.pricing?.["1"]?.price || "N/A"}
+                      <span
+                        className={`text-xs md:text-base font-light font-raleway ${
+                          isDark ? "text-white/70" : "text-black/70"
+                        }`}
+                      >
+                        / {plan.duration} {plan.durationUnit}
+                      </span>
+                    </h1>
+                  </div>
+                </div>
+
+                {/* Services List */}
+                <div className="flex-1 overflow-y-auto mt-5 space-y-3 hide-scrollbar">
+                  {plan.services?.length > 0 ? (
+                    plan.services.map((service) => (
+                      <div
+                        key={service._id}
+                        className="flex gap-x-3 items-center"
+                      >
+                        <CheckCircle2
+                          className={`w-6 h-6 ${
+                            isDark ? "text-vahan_secondry" : "text-black"
+                          }`}
+                        />
+                        <p
+                          className={`font-light ${
+                            isDark ? "text-white" : "text-black"
+                          } font-raleway`}
+                        >
+                          {service.name}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <p
+                      className={`font-light ${
+                        isDark ? "text-white" : "text-black"
+                      } font-raleway`}
+                    >
+                      No services available
+                    </p>
+                  )}
+                </div>
+
+                {/* Purchase Button */}
+                <a
+                  href="/subscription"
+                  className={`mt-6 py-3 rounded-full text-center font-medium transition-all duration-150 ${
+                    isDark
+                      ? "bg-blue-600 text-white hover:bg-blue-700"
+                      : "bg-black text-white hover:bg-gray-800"
+                  }`}
+                >
+                  Purchase Now
+                </a>
+              </div>
+            </div>
+          );
+        })}
       </div>
+
+      <style>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </section>
   );
 };

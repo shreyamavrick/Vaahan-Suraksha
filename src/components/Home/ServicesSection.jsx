@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const ServicesSection = () => {
   const [products, setProducts] = useState([]);
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -22,6 +23,28 @@ const ServicesSection = () => {
     fetchProducts();
   }, []);
 
+  // Continuous auto-scroll
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+
+    let scrollAmount = 0;
+    const speed = 1; // pixels per frame
+    const maxScroll = scrollContainer.scrollWidth / 2;
+
+    const animate = () => {
+      scrollAmount += speed;
+      if (scrollAmount >= maxScroll) {
+        scrollAmount = 0; // loop back
+      }
+      scrollContainer.scrollLeft = scrollAmount;
+      requestAnimationFrame(animate);
+    };
+    const animationId = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(animationId);
+  }, [products]);
+
   return (
     <section className="py-12 px-4 sm:px-8">
       {/* Heading */}
@@ -30,19 +53,23 @@ const ServicesSection = () => {
           / Custom Services /
         </p>
         <h2 className="text-4xl sm:text-5xl font-bold leading-tight pb-4">
-  Your Vehicle Deserves<br />
-  <span className="text-[#1DA1F2]">Custom </span> Components
-</h2>
-
-
+          Your Vehicle Deserves
+          <br />
+          <span className="text-[#1DA1F2]">Custom </span> Components
+        </h2>
       </div>
 
-      {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-        {products.map((product) => (
-          <div
-            key={product._id}
-            className="bg-white p-6 rounded-xl shadow-md transition-transform hover:scale-105 text-center"
+      {/* Continuous Horizontal Scroll */}
+      <div
+        ref={scrollRef}
+        className="flex gap-6 overflow-x-auto whitespace-nowrap py-4 scrollbar-hide"
+      >
+        {/* Duplicate products for seamless loop */}
+        {[...products, ...products].map((product, idx) => (
+          <a
+            key={idx}
+            href={`/services/${product.name}`}
+            className="inline-block flex-shrink-0 w-40 h-36 rounded-2xl hover:shadow-md bg-white p-4 text-center transition-transform duration-300"
           >
             {product.images?.length > 0 ? (
               <img
@@ -52,18 +79,30 @@ const ServicesSection = () => {
                     : product.images[0].url
                 }
                 alt={product.name}
-                className="w-48 h-48 object-contain mx-auto"
+                className="w-full h-[100px] object-contain mx-auto mb-2"
               />
             ) : (
-              <div className="w-48 h-48 bg-gray-200 rounded-lg mx-auto flex items-center justify-center">
+              <div className="w-full h-[100px] bg-gray-200 rounded-lg flex items-center justify-center mb-2">
                 <span className="text-gray-500 text-sm">No Image</span>
               </div>
             )}
-            <p className="mt-4 font-bold text-lg">{product.name}</p>
-            
-          </div>
+            <h3 className="font-bold text-base text-center">{product.name}</h3>
+          </a>
         ))}
       </div>
+
+      {/* Hide scrollbars CSS */}
+      <style>
+        {`
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+          .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        `}
+      </style>
     </section>
   );
 };
