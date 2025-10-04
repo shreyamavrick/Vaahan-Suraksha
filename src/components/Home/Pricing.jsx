@@ -32,71 +32,62 @@ const Pricing = () => {
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-8 justify-center px-4 max-md:flex-col">
-        {plans.map((plan, idx) => {
-          const isDark = idx % 2 === 1; // alternate: 0 -> white, 1 -> black
-          return (
-            <div
-              key={plan._id}
-              className={`relative flex flex-col rounded-3xl p-8 min-w-[300px] max-w-[350px] shadow-lg transition-transform duration-300 hover:-translate-y-2 ${
-                isDark
-                  ? "bg-black text-white"
-                  : "bg-white text-black"
-              }`}
-            >
-              {/* Header */}
-              <div className="flex flex-col pb-5 border-b border-[#dbdbdb]">
-                <p className={`font-bold font-raleway`}>
-                  {plan.name}
-                </p>
-                <div className="flex items-start py-6">
-                  <span className={`text-3xl md:text-5xl font-bold self-start mr-1`}>
-                    ₹
-                  </span>
-                  <h1 className={`font-bold font-primary text-6xl md:text-7xl`}>
-                    {plan.pricing?.["1"]?.price || "N/A"}
-                    <span className={`text-xs md:text-base font-light font-raleway ${isDark ? "text-white/70" : "text-black/70"}`}>
-                      / {plan.duration} {plan.durationUnit}
-                    </span>
-                  </h1>
-                </div>
-              </div>
+      <div className="flex flex-wrap gap-8 justify-center px-4 max-md:flex-col max-md:items-center">
+  {plans.map((plan, idx) => {
+    const isDark = idx % 2 === 1;
+    return (
+      <div
+        key={plan._id}
+        className={`relative flex flex-col rounded-3xl p-6 md:p-8 shadow-lg transition-transform duration-300 hover:-translate-y-2
+          ${isDark ? "bg-black text-white" : "bg-white text-black"}
+          w-full max-w-[350px] flex-1
+        `}
+      >
+        {/* Header */}
+        <div className="flex flex-col pb-4 md:pb-5 border-b border-[#dbdbdb]">
+          <p className="font-bold font-raleway text-lg md:text-xl">{plan.name}</p>
+          <div className="flex items-start py-4 md:py-6">
+            <span className="text-2xl md:text-3xl font-bold self-start mr-1">₹</span>
+            <h1 className="font-bold font-primary text-4xl md:text-6xl">
+              {plan.pricing?.["1"]?.price || "N/A"}
+              <span className={`text-xs md:text-base font-light font-raleway ${isDark ? "text-white/70" : "text-black/70"}`}>
+                / {plan.duration} {plan.durationUnit}
+              </span>
+            </h1>
+          </div>
+        </div>
 
-              {/* Services List */}
-              <div className={`flex-1 mt-5 space-y-3 overflow-y-auto ${isDark ? "scrollbar-blue" : "scrollbar-black"} hide-scrollbar`}>
-                {plan.services?.length > 0 ? (
-                  plan.services.map((service) => (
-                    <div key={service._id} className="flex gap-x-3 items-center">
-                      <CheckCircle2 className={`w-6 h-6 ${isDark ? "text-blue-500" : "text-black"}`} />
-                      <p className={`font-light font-raleway ${isDark ? "text-white" : "text-black"}`}>
-                        {service.name}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <p className={`font-light font-raleway ${isDark ? "text-white" : "text-black"}`}>
-                    No services available
-                  </p>
-                )}
-              </div><br></br>
-
-              {/* Purchase Button */}
-              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
-                <a
-                  href="/subscription"
-                  className={`w-max px-6 h-12 flex items-center justify-center rounded-full font-primary text-white transition-all duration-150 ${
-                    isDark
-                      ? "bg-blue-600 hover:bg-blue-700"
-                      : "bg-black hover:bg-gray-800"
-                  }`}
-                >
-                  Purchase Now
-                </a>
-              </div>
+        {/* Services */}
+        <div className={`flex-1 mt-4 md:mt-5 space-y-2 md:space-y-3 overflow-y-auto ${isDark ? "scrollbar-blue" : "scrollbar-black"} hide-scrollbar`} style={{ minHeight: "300px", maxHeight: "350px" }}>
+          {plan.services?.map((service) => (
+            <div key={service._id} className="flex gap-x-3 items-center">
+              <CheckCircle2 className={`w-5 h-5 md:w-6 md:h-6 ${isDark ? "text-blue-500" : "text-black"}`} />
+              <p className={`font-light font-raleway text-sm md:text-base ${isDark ? "text-white" : "text-black"}`}>{service.name}</p>
             </div>
-          );
-        })}
+          ))}
+        </div>
+
+        {/* Button */}
+        {/* Button */}
+<div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2">
+  <a
+    href="/subscription"
+    className={`w-max px-6 h-12 flex items-center justify-center rounded-full font-primary text-white text-base transition-all duration-150 ${
+      isDark
+        ? "bg-blue-600 hover:bg-blue-700"
+        : "bg-black hover:bg-gray-800"
+    }`}
+  >
+    Purchase Now
+  </a>
+</div>
+
       </div>
+    );
+  })}
+</div>
+
+
 
       <style>{`
         .hide-scrollbar::-webkit-scrollbar {
