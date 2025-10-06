@@ -17,7 +17,6 @@ export default function CheckoutSubs() {
   const [err, setErr] = useState("");
   const locationRef = useRef(null);
 
-  // Load cart + planId from localStorage
   useEffect(() => {
     const saved = localStorage.getItem("checkoutData");
     if (saved) {
@@ -27,7 +26,6 @@ export default function CheckoutSubs() {
     }
   }, []);
 
-  // Prefill user data
   useEffect(() => {
     if (!user) return;
     setFormData((prev) => ({
@@ -37,7 +35,6 @@ export default function CheckoutSubs() {
     }));
   }, [user]);
 
-  // Google Maps Autocomplete
   useEffect(() => {
     if (!window.google || !locationRef.current) return;
     const autocomplete = new window.google.maps.places.Autocomplete(locationRef.current, {
@@ -88,6 +85,7 @@ export default function CheckoutSubs() {
 
     try {
       const token = localStorage.getItem("token");
+
       const payload = {
         name: formData.name,
         phoneNo: formData.phone,
@@ -97,13 +95,41 @@ export default function CheckoutSubs() {
         serviceIds: cart.map((s) => s._id),
       };
 
+      // Step 1: Create subscription order
       const res = await axios.post(
         "https://vaahan-suraksha-backend.vercel.app/api/v1/order/monthly/create",
         payload,
-        { headers: { "Content-Type": "application/json", Authorization: token ? `Bearer ${token}` : "" } }
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
       );
 
+      // Step 2: If booking successful → decrease limit
       if (res.data?.success) {
+        try {
+          const decreaseRes = await axios.post(
+            "https://vaahan-suraksha-backend.vercel.app/api/v1/subscription/decrease-limit",
+            { planId },
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: token ? `Bearer ${token}` : "",
+              },
+            }
+          );
+
+          if (decreaseRes.data?.success) {
+            console.log("✅ Subscription limit decreased successfully.");
+          } else {
+            console.warn("⚠️ Failed to decrease limit:", decreaseRes.data?.message);
+          }
+        } catch (limitErr) {
+          console.error("❌ Error decreasing limit:", limitErr);
+        }
+
         alert("Booking successful! You can now view your services in the dashboard.");
         localStorage.removeItem("checkoutData");
         navigate("/dashboard/orders");
@@ -138,28 +164,62 @@ export default function CheckoutSubs() {
   return (
     <section className="min-h-screen py-14 bg-gradient-to-b from-indigo-50 to-white flex justify-center px-4">
       <div className="w-full max-w-3xl bg-white rounded-xl shadow-lg p-8 sm:p-12">
-        <h1 className="text-3xl font-extrabold mb-6 text-gray-900 text-center sm:text-left">Checkout</h1>
+        <h1 className="text-3xl font-extrabold mb-6 text-gray-900 text-center sm:text-left">
+          Checkout
+        </h1>
 
         <div className="space-y-4 mb-6">
           <div>
             <label className="block text-gray-700 font-medium mb-1">Full Name</label>
-            <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full border p-3 rounded-lg" />
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="w-full border p-3 rounded-lg"
+            />
           </div>
 
           <div>
             <label className="block text-gray-700 font-medium mb-1">Phone</label>
-            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full border p-3 rounded-lg" />
+            <input
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              className="w-full border p-3 rounded-lg"
+            />
           </div>
 
           <div>
             <label className="block text-gray-700 font-medium mb-1">Booking Date</label>
-            <input type="date" name="scheduledDate" value={formData.scheduledDate} onChange={handleChange} className="w-full border p-3 rounded-lg" />
+            <input
+              type="date"
+              name="scheduledDate"
+              value={formData.scheduledDate}
+              onChange={handleChange}
+              className="w-full border p-3 rounded-lg"
+            />
           </div>
 
           <div>
             <label className="block text-gray-700 font-medium mb-1">Location</label>
-            <input ref={locationRef} type="text" name="location" value={formData.location} onChange={handleChange} className="w-full border p-3 rounded-lg" placeholder="Enter your address" />
-            <button type="button" onClick={useCurrentLocation} className="mt-2 text-sm text-indigo-600 underline">Use Current Location</button>
+            <input
+              ref={locationRef}
+              type="text"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              className="w-full border p-3 rounded-lg"
+              placeholder="Enter your address"
+            />
+            <button
+              type="button"
+              onClick={useCurrentLocation}
+              className="mt-2 text-sm text-indigo-600 underline"
+            >
+              Use Current Location
+            </button>
           </div>
 
           {err && <p className="text-red-600 mt-2">{err}</p>}
