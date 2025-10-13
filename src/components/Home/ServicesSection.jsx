@@ -23,19 +23,19 @@ const ServicesSection = () => {
     fetchProducts();
   }, []);
 
-  // Continuous auto-scroll
+  
   useEffect(() => {
     const scrollContainer = scrollRef.current;
     if (!scrollContainer) return;
 
     let scrollAmount = 0;
-    const speed = 1; // pixels per frame
+    const speed = 1;
     const maxScroll = scrollContainer.scrollWidth / 2;
 
     const animate = () => {
       scrollAmount += speed;
       if (scrollAmount >= maxScroll) {
-        scrollAmount = 0; // loop back
+        scrollAmount = 0; 
       }
       scrollContainer.scrollLeft = scrollAmount;
       requestAnimationFrame(animate);
@@ -47,7 +47,7 @@ const ServicesSection = () => {
 
   return (
     <section className="py-12 px-4 sm:px-8">
-      {/* Heading */}
+      
       <div className="mb-10">
         <p className="text-[#1DA1F2] uppercase font-semibold tracking-wider pb-2">
           / Custom Services /
@@ -59,12 +59,12 @@ const ServicesSection = () => {
         </h2>
       </div>
 
-      {/* Continuous Horizontal Scroll */}
+     
       <div
         ref={scrollRef}
         className="flex gap-6 overflow-x-auto whitespace-nowrap py-4 scrollbar-hide"
       >
-        {/* Duplicate products for seamless loop */}
+       
         {[...products, ...products].map((product, idx) => (
           <a
             key={idx}
@@ -91,7 +91,7 @@ const ServicesSection = () => {
         ))}
       </div>
 
-      {/* Hide scrollbars CSS */}
+    
       <style>
         {`
           .scrollbar-hide::-webkit-scrollbar {

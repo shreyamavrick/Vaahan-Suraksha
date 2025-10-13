@@ -15,7 +15,6 @@ const BannerSection = () => {
     <section ref={ref} className="w-full px-4 md:px-8 py-10">
   <div className="flex flex-col md:flex-row items-center gap-6 w-full md:h-60">
     
-    {/* Left Block - hidden on mobile */}
     <div className="hidden md:flex flex-1 w-full relative bg-white rounded-3xl overflow-hidden h-106 md:h-full">
       <img
         src={roadsideImg}
@@ -32,7 +31,6 @@ const BannerSection = () => {
       </div>
     </div>
 
-    {/* Center Counter */}
     <div className="md:w-64 w-full h-75 md:h-full bg-blue-600 rounded-3xl flex flex-col justify-center items-center p-6 text-white">
       <div className="flex items-center">
         <h2 className="text-6xl font-bold">
@@ -47,7 +45,6 @@ const BannerSection = () => {
       </p>
     </div>
 
-    {/* Right Block - hidden on mobile */}
     <div className="hidden md:flex flex-1 w-full relative bg-white rounded-3xl overflow-hidden h-106 md:h-full">
       <img
         src={mechanicImg}
