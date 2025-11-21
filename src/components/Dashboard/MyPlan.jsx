@@ -4,7 +4,7 @@ import { ChevronDown, ChevronUp } from "react-feather";
 import { useNavigate } from "react-router-dom";
 
 export default function MyPlan() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);    
   const [currentPlan, setCurrentPlan] = useState(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [services, setServices] = useState([]);

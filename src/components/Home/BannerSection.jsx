@@ -2,69 +2,93 @@ import React from "react";
 import CountUp from "react-countup";
 import { useInView } from "react-intersection-observer";
 
-import roadsideImg from "../../assets/roadside.webp";
-import mechanicImg from "../../assets/mechanic.webp";
+import image1 from "../../assets/image1.jpg";
+import image2 from "../../assets/image2.jpg";
+import image4 from "../../assets/image4.webp";
+import image5 from "../../assets/image5.avif";
 
-const BannerSection = () => {
-  const { ref, inView } = useInView({
-    triggerOnce: true, 
-    threshold: 0.3,
-  });
+export default function BannerSection() {
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.2 });
 
   return (
-    <section ref={ref} className="w-full px-4 md:px-8 py-10">
-  <div className="flex flex-col md:flex-row items-center gap-6 w-full md:h-60">
-    
-    <div className="hidden md:flex flex-1 w-full relative bg-white rounded-3xl overflow-hidden h-106 md:h-full">
-      <img
-        src={roadsideImg}
-        alt="Roadside"
-        className="absolute inset-0 m-auto w-72 md:w-84 lg:w-110 object-contain object-top md:object-cover h-full pointer-events-none"
-      />
-      <div className="pl-6 pr-4 py-6 flex flex-col justify-center relative z-10 h-full bg-gradient-to-t from-white/70 via-white/40 to-transparent">
-        <p className="text-blue-600 uppercase font-semibold text-sm mb-2">
-          / Road Side /
-        </p>
-        <h1 className="text-2xl font-bold text-black leading-snug">
-          Roadside Assistance <br /> for Your Vehicle
-        </h1>
+    <section ref={ref} className="w-full px-4 md:px-8 py-12">
+      {/* Five equal circular feature cards in a single row */}
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-between items-center gap-6">
+
+          {/* Card 1 */}
+          <div
+            className={`flex-1 min-w-0 flex flex-col items-center text-center p-6 ${
+              inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            } transition-all duration-700`}
+          >
+            <div className="w-28 h-28 rounded-full bg-white/90 flex items-center justify-center shadow-lg overflow-hidden">
+              <img src={image1} alt="image1" className="w-full h-full object-cover" />
+            </div>
+            <h4 className="mt-4 font-semibold">Roadside Help</h4>
+            <p className="mt-2 text-sm text-gray-500">Towing, fuel delivery &amp; more</p>
+          </div>
+
+          {/* Card 2 */}
+          <div
+            className={`flex-1 min-w-0 flex flex-col items-center text-center p-6 ${
+              inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            } transition-all duration-800 delay-75`}
+          >
+            <div className="w-28 h-28 rounded-full bg-white/90 flex items-center justify-center shadow-lg overflow-hidden">
+              <img src={image2} alt="image2" className="w-full h-full object-cover" />
+            </div>
+            <h4 className="mt-4 font-semibold">Quick Response</h4>
+            <p className="mt-2 text-sm text-gray-500">Average arrival under 30 mins</p>
+          </div>
+
+          {/* Card 3 - stats center */}
+          <div
+            className={`flex-1 min-w-0 flex flex-col items-center text-center p-6 ${
+              inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            } transition-all duration-900 delay-150`}
+          >
+            <div className="w-28 h-28 rounded-full bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center shadow-2xl text-white">
+              <div>
+                <div className="text-2xl md:text-3xl font-extrabold leading-none">
+                  {inView ? <CountUp start={1} end={230} duration={3} /> : 0}
+                  <span className="ml-1 text-lg">+</span>
+                </div>
+                <div className="text-xs">Experts</div>
+              </div>
+            </div>
+            <h4 className="mt-4 font-semibold">Trusted Pros</h4>
+            <p className="mt-2 text-sm text-gray-500">Certified &amp; background checked</p>
+          </div>
+
+          {/* Card 4 */}
+          <div
+            className={`flex-1 min-w-0 flex flex-col items-center text-center p-6 ${
+              inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            } transition-all duration-1000 delay-200`}
+          >
+            <div className="w-28 h-28 rounded-full bg-white/90 flex items-center justify-center shadow-lg overflow-hidden">
+              <img src={image4} alt="image4" className="w-full h-full object-cover" />
+            </div>
+            <h4 className="mt-4 font-semibold">Easy Booking</h4>
+            <p className="mt-2 text-sm text-gray-500">Seamless, no surprises</p>
+          </div>
+
+          {/* Card 5 */}
+          <div
+            className={`flex-1 min-w-0 flex flex-col items-center text-center p-6 ${
+              inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+            } transition-all duration-1100 delay-250`}
+          >
+            <div className="w-28 h-28 rounded-full bg-white/90 flex items-center justify-center shadow-lg overflow-hidden">
+              <img src={image5} alt="image5" className="w-full h-full object-cover" />
+            </div>
+            <h4 className="mt-4 font-semibold">Certified Techs</h4>
+            <p className="mt-2 text-sm text-gray-500">Background checked &amp; insured</p>
+          </div>
+
+        </div>
       </div>
-    </div>
-
-    <div className="md:w-64 w-full h-75 md:h-full bg-blue-600 rounded-3xl flex flex-col justify-center items-center p-6 text-white">
-      <div className="flex items-center">
-        <h2 className="text-6xl font-bold">
-          {inView ? <CountUp start={1} end={230} duration={3} /> : 0}
-        </h2>
-        <span className="text-6xl font-bold ml-1">+</span>
-      </div>
-      <p className="text-lg font-medium text-center leading-snug mt-2">
-        Professional and <br />
-        Experienced staff ready <br />
-        to help you
-      </p>
-    </div>
-
-    <div className="hidden md:flex flex-1 w-full relative bg-white rounded-3xl overflow-hidden h-106 md:h-full">
-      <img
-        src={mechanicImg}
-        alt="Top Services"
-        className="absolute inset-0 m-auto w-48 md:w-56 object-contain md:object-cover h-full pointer-events-none"
-      />
-      <div className="pl-6 pr-4 py-6 flex flex-col justify-center relative z-10 h-full bg-gradient-to-t from-white/70 via-white/40 to-transparent">
-        <p className="text-blue-600 uppercase font-semibold text-sm mb-2">
-          / Top Services /
-        </p>
-        <h1 className="text-2xl font-bold text-black leading-snug">
-          Easy Booking & <br /> Fast Communication
-        </h1>
-      </div>
-    </div>
-
-  </div>
-</section>
-
+    </section>
   );
-};
-
-export default BannerSection;
+}
